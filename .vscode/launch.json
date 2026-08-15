@@ -1,0 +1,31 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "julia",
+            "request": "launch",
+            "name": "ProcessSources.jl",
+            "program": "${workspaceFolder}/src/ProcessSources.jl",
+            "stopOnEntry": false,
+            "args": [
+                "--sources-path-prefix", "/Users/sjenkins/Downloads/ExportBlock-fb602d6e-08ab-4f24-8084-dd0b18141d25-Part-1/ISQ & SI Reference",
+                "--documents-source", "Defining Documents ff3fbbe356d348cfb81f1038b92ce8fe.csv",
+                "--quantities-source", "ISQ Quantities e1b3e75b0f85444aa01339cbc9e867df.csv",
+                "--units-source", "SI Units b419c70b1bf040e3b87a04a900378d01.csv"
+            ]
+        },
+        {
+            "type": "julia",
+            "request": "launch",
+            "name": "Run active Julia file",
+            "program": "${file}",
+            "stopOnEntry": false,
+            "cwd": "${workspaceFolder}",
+            "env": {},
+            "juliaEnv": "${command:activeJuliaEnvironment}"
+        }
+    ]
+}
