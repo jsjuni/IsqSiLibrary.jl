@@ -1,0 +1,13 @@
+name = "IsqSiLibrary"
+uuid = "c2f9d308-877a-4d9b-9097-210277487940"
+authors = ["James Steven Jenkins <sjenkins@studioj.us> and contributors"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1.10.10"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
