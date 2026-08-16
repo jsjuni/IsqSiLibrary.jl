@@ -152,7 +152,7 @@ module IsqSiLibrary
             if d["type"] == "Derived"
                 d["expression"] = unit_data["Expressed In Base Units"]
             end
-            d["definition"] = unit_data["Definition"]
+            d["description"] = unit_data["Definition"]
             d["symbol"] = unit_data["Symbol"]
             quantity_string = unit_data["ISQ Quantities"]
             if !ismissing(quantity_string)

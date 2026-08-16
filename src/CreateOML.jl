@@ -8,6 +8,9 @@ module Main
     using OrderedCollections
     using OMLCodeAPI
 
+    const DC_DESCRIPTION = "<http://purl.org/dc/elements/1.1/description>"
+    const RDFS_LABEL = "<http://www.w3.org/2000/01/rdf-schema#label>"
+
     function parse_commandline()
         s = ArgParseSettings()
         @add_arg_table s begin
@@ -47,11 +50,27 @@ module Main
         (iri, ns)
     end
 
+    function create_quantity_or_unit_instance(instance_data, instance_id, namespace_base, separator)
+        operations = []
+        (description_iri, description_ns) = ontology_iri_ns(
+            namespace_base, instance_data["description_iri_stem"], separator
+        )
+        instance_iri = description_ns * instance_id
+        push!(operations, create_instance(description_iri, instance_id))
+        push!(operations, add_annotation(description_iri, instance_iri, RDFS_LABEL, instance_data["name"]))
+        push!(operations, add_annotation(description_iri, instance_iri, DC_DESCRIPTION, instance_data["description"]))
+    end
+
     function(@main)(ARGS)
 
         @info "$(now()) start"
         @info "$(now()) parse command arguments"
         args = parse_commandline()
+
+        # shorter names
+
+        namespace_base = args["namespace-base"]
+        separator = args["separator"]
 
         # check server status
 
@@ -119,16 +138,11 @@ module Main
 
         @info "$(now()) process quantities"
         for (quantity_id, quantity_data) in input["quantity_instances"]
-            (vocabulary_iri, unused) = ontology_iri_ns(
-                args["namespace-base"], quantity_data["vocabulary_iri_stem"], args["separator"]
-            )
-            (description_iri, unused) = ontology_iri_ns(
-                args["namespace-base"], quantity_data["description_iri_stem"], args["separator"]
-            )
-             @info "$(now())   $description_iri $quantity_id"
+            @info "$(now())     $(quantity_data["description_iri_stem"]) $quantity_id"
 
             # create quantity instance
-            push!(stage_1, create_instance(description_iri, quantity_id))
+
+            append!(stage_1, create_quantity_or_unit_instance(quantity_data, quantity_id, namespace_base, separator))
 
             # create quantity classes
 
@@ -138,19 +152,14 @@ module Main
 
         @info "$(now()) process units"
         for (unit_id, unit_data) in input["unit_instances"]
-            (vocabulary_iri, unused) = ontology_iri_ns(
-                args["namespace-base"], unit_data["vocabulary_iri_stem"], args["separator"]
-            )
-            (description_iri, unused) = ontology_iri_ns(
-                args["namespace-base"], unit_data["description_iri_stem"], args["separator"]
-            )
-             @info "$(now())   $description_iri $unit_id"
+            @info "$(now())     $(unit_data["description_iri_stem"]) $unit_id"
 
-            # create unit instance
-            push!(stage_1, create_instance(description_iri, unit_id))
+            # create quantity instance
 
-            # create unit classes
- 
+            append!(stage_1, create_quantity_or_unit_instance(unit_data, unit_id, namespace_base, separator))
+
+            # create quantity classes
+
         end
 
         # update server
