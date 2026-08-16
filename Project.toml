@@ -6,16 +6,22 @@ authors = ["James Steven Jenkins <sjenkins@studioj.us> and contributors"]
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
+NamingConventions = "d2ef9726-cd01-476d-83ec-59819e6084ab"
+OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 
 [compat]
 ArgParse = "1.2.0"
 CSV = "0.10.16"
+DataFrames = "1.8.2"
 Dates = "1.11.0"
 JSON = "1.7.1"
 Logging = "1.11.0"
+NamingConventions = "0.1.1"
+OrderedCollections = "2.0.1"
 julia = "1.10.10"
 
 [extras]
