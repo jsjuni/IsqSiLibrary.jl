@@ -7,6 +7,20 @@
         {
             "type": "julia",
             "request": "launch",
+            "name": "CreateOML.jl",
+            "program": "${workspaceFolder}/src/CreateOML.jl",
+            "stopOnEntry": false,
+            "args": [
+                "--input", "${workspaceFolder}/build/json/isq-si.json",
+                "--server", "http://127.0.0.1:55411",
+                "--path-base", "${workspaceFolder}/build/oml",
+                "--namespace-base", "http://iso.org",
+                "--defer-diagnostics"
+            ]
+        },
+        {
+            "type": "julia",
+            "request": "launch",
             "name": "ProcessSources.jl",
             "program": "${workspaceFolder}/src/ProcessSources.jl",
             "stopOnEntry": false,
@@ -15,7 +29,8 @@
                 "--documents-source", "Defining Documents ff3fbbe356d348cfb81f1038b92ce8fe.csv",
                 "--quantities-source", "ISQ Quantities e1b3e75b0f85444aa01339cbc9e867df.csv",
                 "--units-source", "SI Units b419c70b1bf040e3b87a04a900378d01.csv",
-                "--prefixes-source", "SI Prefixes 00b23fe2521d407688f118fd44e4e1f1.csv"
+                "--prefixes-source", "SI Prefixes 00b23fe2521d407688f118fd44e4e1f1.csv",
+                "--output", "${workspaceFolder}/build/json/isq-si.json"
             ]
         },
         {

@@ -29,6 +29,10 @@ module Main
                 help = "prefixes source file (JSON)"
                 arg_type = String
                 required = true
+           "--output"
+                help = "Output JSON file (default: output.json)"
+                arg_type = String
+                default = ""
         end
         return parse_args(s)
     end
@@ -109,7 +113,8 @@ module Main
         # write output
         #
 
-        JSON.json(stdout, knowledge, pretty = true)
+        output = (args["output"] == "" ? stdout : open(args["output"], "w"))
+        JSON.json(output, knowledge, pretty = true)
         
         #
         # end

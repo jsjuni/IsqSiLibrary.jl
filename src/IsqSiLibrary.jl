@@ -98,7 +98,8 @@ module IsqSiLibrary
             d = initialize_dictionary()
             d["type"] = type
             d["iri_stem"] = "$stem/$suffix"
-           bundles["$stem $type"] = d
+            d["prefix"] = "$stem-$suffix"
+            bundles["$stem $type"] = d
         end
         for (bundle_data) in values(bundles)
             imports = []
