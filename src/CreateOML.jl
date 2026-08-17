@@ -75,11 +75,13 @@ module Main
             namespace_base, instance_data["description_iri_stem"], separator
         )
         instance_iri = description_ns * instance_id
-        push!(operations, create_instance(description_iri, instance_id))
-        push!(operations, add_assertion(description_iri, instance_iri, RDF_TYPE, base_or_derived))
-        push!(operations, add_annotation(description_iri, instance_iri, RDFS_LABEL, instance_data["name"]))
-        push!(operations, add_annotation(description_iri, instance_iri, DC_DESCRIPTION, instance_data["description"]))
-        push!(operations, add_assertion(description_iri, instance_iri, has_identifier, instance_data["name"]))
+        append!(operations, [
+            create_instance(description_iri, instance_id),
+            add_assertion(description_iri, instance_iri, RDF_TYPE, base_or_derived),
+            add_annotation(description_iri, instance_iri, RDFS_LABEL, instance_data["name"]),
+            add_annotation(description_iri, instance_iri, DC_DESCRIPTION, instance_data["description"]),
+            add_assertion(description_iri, instance_iri, has_identifier, instance_data["name"])
+        ])
     end
 
     function(@main)(ARGS)
