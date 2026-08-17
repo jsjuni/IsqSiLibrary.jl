@@ -123,11 +123,6 @@ module Main
             "stage 2" => stage_2
         )
 
-        # find ontologies required by quantities defined
-
-        # instances = mapfoldl(k -> values(input[k]), append!, ["quantity_instances", "unit_instances"], init =[])
-        # ontology_iri_stems = Set(Iterators.flatmap(d -> (d["vocabulary_iri_stem"], d["description_iri_stem"]), instances))
-
         # create ontologies
 
         @info "$(now()) create ontologies"
