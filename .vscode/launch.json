@@ -27,6 +27,7 @@
             "stopOnEntry": false,
             "args": [
                 "--sources-path-prefix", "${workspaceFolder}/resource/ISQ & SI Reference",
+                "--dimensions-source", "SI Base Dimensions a72ac099666843ed86e0c23c45c5304a.csv",
                 "--documents-source", "Defining Documents ff3fbbe356d348cfb81f1038b92ce8fe.csv",
                 "--quantities-source", "ISQ Quantities e1b3e75b0f85444aa01339cbc9e867df.csv",
                 "--units-source", "SI Units b419c70b1bf040e3b87a04a900378d01.csv",

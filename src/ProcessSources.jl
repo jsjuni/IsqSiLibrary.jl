@@ -13,6 +13,10 @@ module Main
                 help = "path prefix to sources"
                 arg_type = String
                 required = true
+            "--dimensions-source"
+                help = "dimensions source file (JSON)"
+                arg_type = String
+                required = true
             "--documents-source"
                 help = "documents source file (JSON)"
                 arg_type = String
@@ -56,6 +60,9 @@ module Main
         @info "$(now()) loading documents source $(args["documents-source"])"
         documents_csv = load_csv_document(args["sources-path-prefix"], args["documents-source"])
  
+        @info "$(now()) loading dimensions source $(args["dimensions-source"])"
+        dimensions_csv = load_csv_document(args["sources-path-prefix"], args["dimensions-source"])
+
         @info "$(now()) loading quantities source $(args["quantities-source"])"
         quantities_csv = load_csv_document(args["sources-path-prefix"], args["quantities-source"])
 
@@ -72,6 +79,10 @@ module Main
         @info "$(now()) building documents dictionary"
         documents = table_to_dict(documents_csv, "Document")
  
+        # stub; not used for now
+        @info "$(now()) building dimensions dictionary"
+        dimensions = table_to_dict(dimensions_csv, "Base Dimension")
+
         @info "$(now()) building quantities dictionary"
         quantities = table_to_dict(quantities_csv, "Quantity")
 

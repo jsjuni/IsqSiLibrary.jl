@@ -73,6 +73,12 @@ module IsqSiLibrary
         OrderedDict{String, Any}()
     end
 
+    export construct_dimensions
+    function construct_dimensions(dimensions)
+        dimensions = initialize_dictionary()
+        dimensions
+    end
+
     export construct_ontologies
     function construct_ontologies(documents)
 
