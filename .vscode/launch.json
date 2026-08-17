@@ -16,7 +16,7 @@
                 "--server", "http://127.0.0.1:55411",
                 "--path-base", "${workspaceFolder}/build/oml",
                 "--namespace-base", "http://iso.org",
-                "--defer-diagnostics" //, "--inhibit-updates"
+                "--defer-diagnostics"//, "--inhibit-updates"
             ]
         },
         {
