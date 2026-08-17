@@ -19,6 +19,7 @@ module Main
 
     const HAS_QUANTITY_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasQuantityIdentifier>"
     const HAS_UNIT_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasUnitIdentifier>"
+    const HAS_SYMBOL = "<http://iso.org/iso-80000/1-v#hasSymbol>"
 
     const ISQ_BASE_QUANTITY = "<http://iso.org/iso-80000/1-v#ISQBaseQuantity>"
     const ISQ_DERIVED_QUANTITY = "<http://iso.org/iso-80000/1-v#ISQDerivedQuantity>"
@@ -87,7 +88,8 @@ module Main
             add_assertion(description_iri, instance_iri, RDF_TYPE, base_or_derived),
             add_annotation(description_iri, instance_iri, RDFS_LABEL, instance_data["name"]),
             add_annotation(description_iri, instance_iri, DC_DESCRIPTION, instance_data["description"]),
-            add_assertion(description_iri, instance_iri, has_identifier, instance_data["name"])
+            add_assertion(description_iri, instance_iri, has_identifier, instance_data["name"]),
+            add_assertion(description_iri, instance_iri, HAS_SYMBOL, instance_data["symbol"])
         ])
     end
 
