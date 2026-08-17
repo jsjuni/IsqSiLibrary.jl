@@ -26,6 +26,11 @@ module Main
     const SI_BASE_UNIT = "<http://iso.org/iso-80000/1-v#SIBaseUnit>"
     const SI_DERIVED_UNIT = "<http://iso.org/iso-80000/1-v#SIDerivedUnit>"
 
+    const IS_BASE_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isBaseUnitFor>"
+    const IS_DERIVED_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isDerivedUnitFor>"
+
+    const IS_PROPERTY_OF = "<http://bipm.org/jcgm/vim3-v#isPropertyOf>"
+
     const PLURAL = Dict("quantity" => "quantities", "unit" => "units", "value" => "values")
 
     function parse_commandline()
@@ -202,20 +207,26 @@ module Main
 
             # create quantity classes
 
+            (vocabulary_iri, vocabulary_ns) = ontology_iri_ns(
+                namespace_base, quantity_data["vocabulary_iri_stem"], separator
+            )
             for category_key in ("quantity", "unit", "value")
                 concept = quantity_data["$(category_key)_class"]
-                (vocabulary_iri, vocabulary_ns) = ontology_iri_ns(
-                    namespace_base, quantity_data["vocabulary_iri_stem"], separator
-                )
                 description = "$(capitalize(PLURAL[category_key])) of quantity kind \"$(quantity_data["name"])\"."
                 @info "$(now())     create concept $vocabulary_ns$concept"
-                @info "$(now())     description: $description"
+                @info "$(now())       description: $description"
                 append!(stage_1, [
                 ])
             end
 
-            # create quantity relation entity
+            # assert quantity class of instance
 
+            @info "$(now())     assert $quantity_id type $(quantity_data["quantity_class"])"
+
+            # create quantity relation
+
+            @info "$(now())     create forward relation $vocabulary_ns$(quantity_data["relation"]["forward"])"
+            @info "$(now())            reverse relation $vocabulary_ns$(quantity_data["relation"]["reverse"])"
             append!(stage_1, [
             ])
 
@@ -240,7 +251,30 @@ module Main
                 )
             )
 
-            # create quantity classes
+            # assert unit class of instance
+            
+            @info "$(now())     assert $unit_id type $(unit_data["unit_class"])"
+
+            # assert "is unit for" relation if appropriate
+
+            if haskey(unit_data, "quantity")
+                relation = unit_data["type"] == "Base" ? IS_BASE_UNIT_FOR : IS_DERIVED_UNIT_FOR
+                (u_description_iri, u_description_ns) = ontology_iri_ns(
+                    namespace_base, unit_data["description_iri_stem"], separator
+                )
+                quantity_id = unit_data["quantity"]
+                quantity_data = input["quantity_instances"][quantity_id]
+                (q_description_iri, q_description_ns) = ontology_iri_ns(
+                    namespace_base, quantity_data["description_iri_stem"], separator
+                )
+                unit_iri = u_description_ns * unit_id
+                quantity_iri = q_description_ns * quantity_id
+                @info "$(now())     assert $unit_id unit for relation to $quantity_id"
+                push!(stage_1,
+                    add_assertion(u_description_iri, unit_iri, relation, quantity_iri)
+                )
+            end
+
 
         end
 
