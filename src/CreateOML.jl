@@ -8,14 +8,27 @@ module Main
     using OrderedCollections
     using OMLCodeAPI
     
+    # dc vocabulary
+
     const DC_CREATOR = "<http://purl.org/dc/elements/1.1/creator>"
     const DC_DESCRIPTION = "<http://purl.org/dc/elements/1.1/description>"
     const DC_SOURCE = "<http://purl.org/dc/elements/1.1/source>"
     const DC_TITLE = "<http://purl.org/dc/elements/1.1/title>"
 
+    # rdf vocabulary
+
     const RDF_TYPE = "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"
 
+    # rdfs vocabulary
+
     const RDFS_LABEL = "<http://www.w3.org/2000/01/rdf-schema#label>"
+
+    # vim3 vocabulary
+
+    const IS_PROPERTY_OF = "<http://bipm.org/jcgm/vim3-v#isPropertyOf>"
+    const HAS_DIMENSION_SYMBOL = "<http://bipm.org/jcgm/vim3-v#hasDimensionSymbol>"
+
+    # iso 80000 vocabulary
 
     const HAS_QUANTITY_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasQuantityIdentifier>"
     const HAS_UNIT_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasUnitIdentifier>"
@@ -30,7 +43,7 @@ module Main
     const IS_BASE_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isBaseUnitFor>"
     const IS_DERIVED_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isDerivedUnitFor>"
 
-    const IS_PROPERTY_OF = "<http://bipm.org/jcgm/vim3-v#isPropertyOf>"
+    #
 
     const PLURAL = Dict("quantity" => "quantities", "unit" => "units", "value" => "values")
 
@@ -207,11 +220,16 @@ module Main
                 )
             )
 
-            # create quantity classes
-
             (vocabulary_iri, vocabulary_ns) = ontology_iri_ns(
                 namespace_base, quantity_data["vocabulary_iri_stem"], separator
             )
+            (description_iri, description_ns) = ontology_iri_ns(
+                namespace_base, quantity_data["description_iri_stem"], separator
+            )
+            quantity_iri = description_ns * quantity_id
+
+            # create quantity classes
+
             for category_key in ("quantity", "unit", "value")
                 concept = quantity_data["$(category_key)_class"]
                 description = "$(capitalize(PLURAL[category_key])) of quantity kind \"$(quantity_data["name"])\"."
@@ -220,6 +238,12 @@ module Main
                 append!(stage_1, [
                 ])
             end
+
+            # assert dimension symbol
+
+            push!(stage_1,
+                add_assertion(description_iri, quantity_iri, HAS_DIMENSION_SYMBOL, quantity_data["dimension_symbol"])
+            )
 
             # assert quantity class of instance
 
