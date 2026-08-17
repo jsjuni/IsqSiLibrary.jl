@@ -135,9 +135,9 @@ module IsqSiLibrary
             d["symbol"] = quantity_data["Symbol"]
             d["dimension_symbol"] = quantity_data["Dimension Symbol"]
             name = instance_name(quantity)
-            d["kind_class"] = NamingConventions.convert(SnakeCase, PascalCase, name)
-            d["unit_class"] = "$(d["kind_class"])Unit"
-            d["value_class"] = "$(d["kind_class"])Value"
+            d["quantity_class"] = NamingConventions.convert(SnakeCase, PascalCase, name)
+            d["unit_class"] = "$(d["quantity_class"])Unit"
+            d["value_class"] = "$(d["quantity_class"])Value"
             quantity_instances[name] = d
         end
         quantity_instances

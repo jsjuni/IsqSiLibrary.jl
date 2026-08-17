@@ -26,6 +26,8 @@ module Main
     const SI_BASE_UNIT = "<http://iso.org/iso-80000/1-v#SIBaseUnit>"
     const SI_DERIVED_UNIT = "<http://iso.org/iso-80000/1-v#SIDerivedUnit>"
 
+    const PLURAL = Dict("quantity" => "quantities", "unit" => "units", "value" => "values")
+
     function parse_commandline()
         s = ArgParseSettings()
         @add_arg_table s begin
@@ -82,6 +84,10 @@ module Main
             add_annotation(description_iri, instance_iri, DC_DESCRIPTION, instance_data["description"]),
             add_assertion(description_iri, instance_iri, has_identifier, instance_data["name"])
         ])
+    end
+
+    function capitalize(string)
+        Base.Unicode.uppercasefirst(string)
     end
 
     function(@main)(ARGS)
@@ -195,6 +201,23 @@ module Main
             )
 
             # create quantity classes
+
+            for category_key in ("quantity", "unit", "value")
+                concept = quantity_data["$(category_key)_class"]
+                (vocabulary_iri, vocabulary_ns) = ontology_iri_ns(
+                    namespace_base, quantity_data["vocabulary_iri_stem"], separator
+                )
+                description = "$(capitalize(PLURAL[category_key])) of quantity kind \"$(quantity_data["name"])\"."
+                @info "$(now())     create concept $vocabulary_ns$concept"
+                @info "$(now())     description: $description"
+                append!(stage_1, [
+                ])
+            end
+
+            # create quantity relation entity
+
+            append!(stage_1, [
+            ])
 
        end
 
