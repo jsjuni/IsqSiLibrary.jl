@@ -138,6 +138,10 @@ module IsqSiLibrary
             d["quantity_class"] = NamingConventions.convert(SnakeCase, PascalCase, name)
             d["unit_class"] = "$(d["quantity_class"])Unit"
             d["value_class"] = "$(d["quantity_class"])Value"
+            d["relation"] = OrderedDict(
+                "forward" => "is$(d["quantity_class"])Of",
+                "reverse" => "has$(d["quantity_class"])"
+            )
             quantity_instances[name] = d
         end
         quantity_instances
@@ -164,7 +168,7 @@ module IsqSiLibrary
             if !ismissing(quantity_string)
                 quantity = instance_name(remove_paren_text(quantity_string))
                 d["quantity"] = quantity
-                d["unit_class"] = NamingConventions.convert(SnakeCase, PascalCase, quantity)
+                d["unit_class"] = NamingConventions.convert(SnakeCase, PascalCase, quantity) * "Unit"
             end
             name = instance_name(unit)
             unit_instances[name] = d
