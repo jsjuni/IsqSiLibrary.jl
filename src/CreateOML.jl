@@ -13,10 +13,18 @@ module Main
     const DC_SOURCE = "<http://purl.org/dc/elements/1.1/source>"
     const DC_TITLE = "<http://purl.org/dc/elements/1.1/title>"
 
+    const RDF_TYPE = "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"
+
     const RDFS_LABEL = "<http://www.w3.org/2000/01/rdf-schema#label>"
 
     const HAS_QUANTITY_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasQuantityIdentifier>"
     const HAS_UNIT_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasUnitIdentifier>"
+
+    const ISQ_BASE_QUANTITY = "<http://iso.org/iso-80000/1-v#ISQBaseQuantity>"
+    const ISQ_DERIVED_QUANTITY = "<http://iso.org/iso-80000/1-v#ISQDerivedQuantity>"
+    
+    const SI_BASE_UNIT = "<http://iso.org/iso-80000/1-v#SIBaseUnit>"
+    const SI_DERIVED_UNIT = "<http://iso.org/iso-80000/1-v#SIDerivedUnit>"
 
     function parse_commandline()
         s = ArgParseSettings()
@@ -61,13 +69,14 @@ module Main
         (iri, ns)
     end
 
-    function create_quantity_or_unit_instance(instance_data, instance_id, namespace_base, has_identifier, separator)
+    function create_quantity_or_unit_instance(instance_data, instance_id, namespace_base, has_identifier, base_or_derived, separator)
         operations = []
         (description_iri, description_ns) = ontology_iri_ns(
             namespace_base, instance_data["description_iri_stem"], separator
         )
         instance_iri = description_ns * instance_id
         push!(operations, create_instance(description_iri, instance_id))
+        push!(operations, add_assertion(description_iri, instance_iri, RDF_TYPE, base_or_derived))
         push!(operations, add_annotation(description_iri, instance_iri, RDFS_LABEL, instance_data["name"]))
         push!(operations, add_annotation(description_iri, instance_iri, DC_DESCRIPTION, instance_data["description"]))
         push!(operations, add_assertion(description_iri, instance_iri, has_identifier, instance_data["name"]))
@@ -178,7 +187,14 @@ module Main
             # create quantity instance
 
             append!(stage_1,
-                create_quantity_or_unit_instance(quantity_data, quantity_id, namespace_base, HAS_QUANTITY_IDENTIFIER, separator)
+                create_quantity_or_unit_instance(
+                    quantity_data,
+                    quantity_id,
+                    namespace_base,
+                    HAS_QUANTITY_IDENTIFIER,
+                    quantity_data["type"] == "Base" ? ISQ_BASE_QUANTITY : ISQ_DERIVED_QUANTITY,
+                    separator
+                )
             )
 
             # create quantity classes
@@ -194,7 +210,14 @@ module Main
             # create quantity instance
 
             append!(stage_1,
-                create_quantity_or_unit_instance(unit_data, unit_id, namespace_base, HAS_UNIT_IDENTIFIER, separator)
+                create_quantity_or_unit_instance(
+                    unit_data,
+                    unit_id,
+                    namespace_base,
+                    HAS_UNIT_IDENTIFIER,
+                    unit_data["type"] == "Base" ? SI_BASE_UNIT : SI_DERIVED_UNIT,
+                    separator
+                )
             )
 
             # create quantity classes
