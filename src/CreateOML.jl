@@ -9,6 +9,9 @@ module Main
     using OMLCodeAPI
 
     const DC_DESCRIPTION = "<http://purl.org/dc/elements/1.1/description>"
+    const DC_SOURCE = "<http://purl.org/dc/elements/1.1/source>"
+    const DC_TITLE = "<http://purl.org/dc/elements/1.1/title>"
+
     const RDFS_LABEL = "<http://www.w3.org/2000/01/rdf-schema#label>"
 
     const HAS_QUANTITY_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasQuantityIdentifier>"
@@ -120,6 +123,15 @@ module Main
                         ontology_data["prefix"],
                         args["path-base"]
                     )
+                )
+                push!(stage_1,
+                    add_annotation(ontology_iri, ontology_iri, DC_TITLE, ontology_id)
+                )
+                push!(stage_1,
+                    add_annotation(ontology_iri, ontology_iri, RDFS_LABEL, ontology_data["label"])
+                )
+                 push!(stage_1,
+                    add_annotation(ontology_iri, ontology_iri, DC_SOURCE, ontology_data["source"])
                 )
             end
         end

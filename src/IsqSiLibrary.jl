@@ -45,6 +45,10 @@ module IsqSiLibrary
         replace(string, r" \(.*" => "")
     end
 
+    function extract_paren_text(string)
+        match(r"\(([^)]*)\)", string)[1]
+    end
+
     export parse_csv_source
     function parse_csv_source(path)
         CSV.read(path, DataFrame)
@@ -78,7 +82,9 @@ module IsqSiLibrary
             if !isnothing(m)
                 for (type, suffix) in ONTOLOGY_TYPES
                     d = initialize_dictionary()
-                    d["source"] = document
+                    d["label"] = document
+                    source = "$document Quantities and units — Part $(document_data["Part"]): $(document_data["Subject Area"])"
+                    d["source"] = source
                     d["type"] = type
                     d["iri_stem"] = "$(lowercase(m[1]))-80000/$(m[2])-$suffix"
                     d["prefix"] = "$(lowercase(m[1]))-80000-$(m[2])-$suffix"
