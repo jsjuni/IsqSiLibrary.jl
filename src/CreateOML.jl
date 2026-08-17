@@ -11,6 +11,9 @@ module Main
     const DC_DESCRIPTION = "<http://purl.org/dc/elements/1.1/description>"
     const RDFS_LABEL = "<http://www.w3.org/2000/01/rdf-schema#label>"
 
+    const HAS_QUANTITY_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasQuantityIdentifier>"
+    const HAS_UNIT_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasUnitIdentifier>"
+
     function parse_commandline()
         s = ArgParseSettings()
         @add_arg_table s begin
@@ -50,7 +53,7 @@ module Main
         (iri, ns)
     end
 
-    function create_quantity_or_unit_instance(instance_data, instance_id, namespace_base, separator)
+    function create_quantity_or_unit_instance(instance_data, instance_id, namespace_base, has_identifier, separator)
         operations = []
         (description_iri, description_ns) = ontology_iri_ns(
             namespace_base, instance_data["description_iri_stem"], separator
@@ -59,6 +62,7 @@ module Main
         push!(operations, create_instance(description_iri, instance_id))
         push!(operations, add_annotation(description_iri, instance_iri, RDFS_LABEL, instance_data["name"]))
         push!(operations, add_annotation(description_iri, instance_iri, DC_DESCRIPTION, instance_data["description"]))
+        push!(operations, add_assertion(description_iri, instance_iri, has_identifier, instance_data["name"]))
     end
 
     function(@main)(ARGS)
@@ -97,20 +101,27 @@ module Main
             "stage 2" => stage_2
         )
 
+        # find ontologies required by quantities defined
+
+        instances = mapfoldl(k -> values(input[k]), append!, ["quantity_instances", "unit_instances"], init =[])
+        ontology_iri_stems = Set(Iterators.flatmap(d -> (d["vocabulary_iri_stem"], d["description_iri_stem"]), instances))
+
         # create ontologies
 
         @info "$(now()) create ontologies"
         for (ontology_id, ontology_data) in input["ontologies"]
-            (ontology_iri, ontology_namespace) = ontology_iri_ns(args["namespace-base"], ontology_data["iri_stem"], args["separator"])
-            @info "$(now())   create $ontology_id $ontology_namespace"
-            push!(stage_1, 
-                create_ontology(
-                    ontology_data["type"],
-                    ontology_namespace,
-                    ontology_data["prefix"],
-                    args["path-base"]
+            if ontology_data["iri_stem"] in ontology_iri_stems
+                (ontology_iri, ontology_namespace) = ontology_iri_ns(args["namespace-base"], ontology_data["iri_stem"], args["separator"])
+                @info "$(now())   create $ontology_id $ontology_namespace"
+                push!(stage_1, 
+                    create_ontology(
+                        ontology_data["type"],
+                        ontology_namespace,
+                        ontology_data["prefix"],
+                        args["path-base"]
+                    )
                 )
-            )
+            end
         end
 
         # create bundles
@@ -142,7 +153,9 @@ module Main
 
             # create quantity instance
 
-            append!(stage_1, create_quantity_or_unit_instance(quantity_data, quantity_id, namespace_base, separator))
+            append!(stage_1,
+                create_quantity_or_unit_instance(quantity_data, quantity_id, namespace_base, HAS_QUANTITY_IDENTIFIER, separator)
+            )
 
             # create quantity classes
 
@@ -156,7 +169,9 @@ module Main
 
             # create quantity instance
 
-            append!(stage_1, create_quantity_or_unit_instance(unit_data, unit_id, namespace_base, separator))
+            append!(stage_1,
+                create_quantity_or_unit_instance(unit_data, unit_id, namespace_base, HAS_UNIT_IDENTIFIER, separator)
+            )
 
             # create quantity classes
 
