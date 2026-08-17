@@ -131,6 +131,8 @@ module IsqSiLibrary
         for (quantity, quantity_data) in quantities
             d = initialize_dictionary()
             d["name"] = quantity
+            alternate_names = quantity_data["Alternate Names"]
+            d["alternate_names"] = ismissing(alternate_names) ? [] : map(remove_paren_text, split(alternate_names, r"\s*,\s*"))
             document = remove_paren_text(quantity_data["Defining Document"])
             ontology_key = "$document description"
             ontology_data = ontologies[ontology_key]

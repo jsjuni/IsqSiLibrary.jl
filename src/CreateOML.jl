@@ -104,6 +104,14 @@ module Main
             add_assertion(description_iri, instance_iri, has_identifier, instance_data["name"]),
             add_assertion(description_iri, instance_iri, HAS_SYMBOL, instance_data["symbol"])
         ])
+        if haskey(instance_data, "alternate_names")
+            for alternate_name in instance_data["alternate_names"]
+                push!(operations,
+                    add_annotation(description_iri, instance_iri, RDFS_LABEL, alternate_name)
+                )
+            end
+        end
+        operations
     end
 
     function capitalize(string)
