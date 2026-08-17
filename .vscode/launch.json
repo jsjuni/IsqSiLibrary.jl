@@ -11,11 +11,12 @@
             "program": "${workspaceFolder}/src/CreateOML.jl",
             "stopOnEntry": false,
             "args": [
+                "--creator", "J Steven Jenkins ORCID 0000-0002-0725-0884",
                 "--input", "${workspaceFolder}/build/json/isq-si.json",
                 "--server", "http://127.0.0.1:55411",
                 "--path-base", "${workspaceFolder}/build/oml",
                 "--namespace-base", "http://iso.org",
-                "--defer-diagnostics"
+                "--defer-diagnostics" //, "--inhibit-updates"
             ]
         },
         {

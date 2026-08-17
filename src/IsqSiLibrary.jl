@@ -82,7 +82,7 @@ module IsqSiLibrary
             if !isnothing(m)
                 for (type, suffix) in ONTOLOGY_TYPES
                     d = initialize_dictionary()
-                    d["label"] = document
+                    d["label"] = "$document:$(document_data["Year"])"
                     source = "$document Quantities and units — Part $(document_data["Part"]): $(document_data["Subject Area"])"
                     d["source"] = source
                     d["type"] = type
@@ -97,7 +97,7 @@ module IsqSiLibrary
     end
 
     export construct_bundles
-    function construct_bundles(ontologies, stem = "iso-80000")
+    function construct_bundles(ontologies, stem = "iso-80000", title_stem = "ISO 80000")
 
         bundles = initialize_dictionary()
         for (type, suffix) in BUNDLE_TYPES
@@ -105,7 +105,7 @@ module IsqSiLibrary
             d["type"] = type
             d["iri_stem"] = "$stem/$suffix"
             d["prefix"] = "$stem-$suffix"
-            bundles["$stem $type"] = d
+            bundles["$title_stem $type"] = d
         end
         for (bundle_data) in values(bundles)
             imports = []

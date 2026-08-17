@@ -7,7 +7,8 @@ module Main
     using JSON
     using OrderedCollections
     using OMLCodeAPI
-
+    
+    const DC_CREATOR = "<http://purl.org/dc/elements/1.1/creator>"
     const DC_DESCRIPTION = "<http://purl.org/dc/elements/1.1/description>"
     const DC_SOURCE = "<http://purl.org/dc/elements/1.1/source>"
     const DC_TITLE = "<http://purl.org/dc/elements/1.1/title>"
@@ -46,6 +47,10 @@ module Main
             "--inhibit-updates"
                 help = "Inhibit updates to server (default: false)"
                 action = :store_true
+            "--creator"
+                help = "Value of dc:creator annotation on ontologies and bundles"
+                arg_type = String
+                default = nothing
         end
         return parse_args(s)
     end
@@ -77,7 +82,10 @@ module Main
         # shorter names
 
         namespace_base = args["namespace-base"]
+        namespace_path = replace(namespace_base, r".*//" => "")
+        path_base = args["path-base"]
         separator = args["separator"]
+        creator = args["creator"]
 
         # check server status
 
@@ -106,33 +114,33 @@ module Main
 
         # find ontologies required by quantities defined
 
-        instances = mapfoldl(k -> values(input[k]), append!, ["quantity_instances", "unit_instances"], init =[])
-        ontology_iri_stems = Set(Iterators.flatmap(d -> (d["vocabulary_iri_stem"], d["description_iri_stem"]), instances))
+        # instances = mapfoldl(k -> values(input[k]), append!, ["quantity_instances", "unit_instances"], init =[])
+        # ontology_iri_stems = Set(Iterators.flatmap(d -> (d["vocabulary_iri_stem"], d["description_iri_stem"]), instances))
 
         # create ontologies
 
         @info "$(now()) create ontologies"
         for (ontology_id, ontology_data) in input["ontologies"]
-            if ontology_data["iri_stem"] in ontology_iri_stems
-                (ontology_iri, ontology_namespace) = ontology_iri_ns(args["namespace-base"], ontology_data["iri_stem"], args["separator"])
+            filename = joinpath(path_base, namespace_path, ontology_data["iri_stem"]) * ".oml"
+            if isfile(filename)
+                @info "$(now())   skip $ontology_id: file exists"
+            else
+                (ontology_iri, ontology_namespace) = ontology_iri_ns(namespace_base, ontology_data["iri_stem"], args["separator"])
                 @info "$(now())   create $ontology_id $ontology_namespace"
-                push!(stage_1, 
+                append!(stage_1, [
                     create_ontology(
                         ontology_data["type"],
                         ontology_namespace,
                         ontology_data["prefix"],
                         args["path-base"]
-                    )
-                )
-                push!(stage_1,
-                    add_annotation(ontology_iri, ontology_iri, DC_TITLE, ontology_id)
-                )
-                push!(stage_1,
-                    add_annotation(ontology_iri, ontology_iri, RDFS_LABEL, ontology_data["label"])
-                )
-                 push!(stage_1,
+                    ),
+                    add_annotation(ontology_iri, ontology_iri, DC_TITLE, ontology_id),
+                    add_annotation(ontology_iri, ontology_iri, RDFS_LABEL, ontology_data["label"]),
                     add_annotation(ontology_iri, ontology_iri, DC_SOURCE, ontology_data["source"])
-                )
+                ])
+                if !isnothing(creator)
+                    push!(stage_1, add_annotation(ontology_iri, ontology_iri, DC_CREATOR, creator))
+                end
             end
         end
 
@@ -140,18 +148,22 @@ module Main
 
         @info "$(now()) create bundles"
         for (bundle_id, bundle_data) in input["bundles"]
-            (bundle_iri, bundle_namespace) = ontology_iri_ns(args["namespace-base"], bundle_data["iri_stem"], args["separator"])
+            (bundle_iri, bundle_namespace) = ontology_iri_ns(namespace_base, bundle_data["iri_stem"], args["separator"])
             @info "$(now())   create $bundle_id $bundle_namespace"
-            push!(stage_1,
+            append!(stage_1, [
                 create_ontology(
                     bundle_data["type"],
                     bundle_namespace,
                     bundle_data["prefix"],
                     args["path-base"]
-                )
-            )
+                ),
+                add_annotation(bundle_iri, bundle_iri, DC_TITLE, bundle_id)
+            ])
+            if !isnothing(creator)
+                push!(stage_1, add_annotation(bundle_iri, bundle_iri, DC_CREATOR, creator))
+            end
             for imprt in bundle_data["imports"]
-                (imprt_iri, unused) = ontology_iri_ns(args["namespace-base"], imprt, args["separator"])
+                (imprt_iri, unused) = ontology_iri_ns(namespace_base, imprt, args["separator"])
                 @info "$(now())     add import for $imprt"
                 push!(stage_2, add_import(bundle_iri, imprt_iri))
             end
@@ -161,7 +173,7 @@ module Main
 
         @info "$(now()) process quantities"
         for (quantity_id, quantity_data) in input["quantity_instances"]
-            @info "$(now())     $(quantity_data["description_iri_stem"]) $quantity_id"
+            @info "$(now())   $(quantity_data["description_iri_stem"]) $quantity_id"
 
             # create quantity instance
 
@@ -177,7 +189,7 @@ module Main
 
         @info "$(now()) process units"
         for (unit_id, unit_data) in input["unit_instances"]
-            @info "$(now())     $(unit_data["description_iri_stem"]) $unit_id"
+            @info "$(now())   $(unit_data["description_iri_stem"]) $unit_id"
 
             # create quantity instance
 
