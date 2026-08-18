@@ -60,7 +60,10 @@ module IsqSiLibrary
     end
 
     function base_expression(dim_string)
-        foldl((s, (dim, unit)) -> replace(s, dim => unit), BASE_UNITS, init = dim_string)
+        replace(
+            foldl((s, (dim, unit)) -> replace(s, dim => unit), BASE_UNITS, init = dim_string),
+            r"\s+" => "·"
+        )
     end
 
     export parse_csv_source
