@@ -1,0 +1,57 @@
+﻿Name,LaTeX,📐 ISQ Quantities
+I,$I$,"electric current (https://app.notion.com/p/electric-current-2ec50445913e4114b8d129774c98cf40?pvs=21), length (https://app.notion.com/p/length-788561f5dc3b4847b77dac2496bbf737?pvs=21)"
+L,$L$,length (https://app.notion.com/p/length-788561f5dc3b4847b77dac2496bbf737?pvs=21)
+phi,$\phi$,"phase angle (https://app.notion.com/p/phase-angle-3c0b24cf917a809290b8fdd7c6e29b96?pvs=21), rotational displacement (https://app.notion.com/p/rotational-displacement-3c0b24cf917a808ca18becd92a0e2c83?pvs=21)"
+theta,$\theta$,rotational displacement (https://app.notion.com/p/rotational-displacement-3c0b24cf917a808ca18becd92a0e2c83?pvs=21)
+gamma,$\alpha$,"angular measure (https://app.notion.com/p/angular-measure-857d6f7e1f5e4a059bc2c801ac2c0c0c?pvs=21), propagation coefficient (https://app.notion.com/p/propagation-coefficient-3c0b24cf917a804bbf5ffa0c5807eba8?pvs=21)"
+beta,$\beta$,"angular measure (https://app.notion.com/p/angular-measure-857d6f7e1f5e4a059bc2c801ac2c0c0c?pvs=21), phase coefficient (https://app.notion.com/p/phase-coefficient-3c0b24cf917a80d8bec0e26e16f15ff2?pvs=21)"
+alpha,$\gamma$,"angular measure (https://app.notion.com/p/angular-measure-857d6f7e1f5e4a059bc2c801ac2c0c0c?pvs=21), attenuation (https://app.notion.com/p/attenuation-3c0b24cf917a80e7b07ff4b6fc47e6f2?pvs=21)"
+(S),$(S)$,volume (https://app.notion.com/p/volume-3c0b24cf917a80c7a55bc128351ae510?pvs=21)
+V,$V$,volume (https://app.notion.com/p/volume-3c0b24cf917a80c7a55bc128351ae510?pvs=21)
+n,$n$,amount of substance (https://app.notion.com/p/amount-of-substance-891f7d9c5ab149998297aa54a69c2797?pvs=21)
+I sub v,$I_v$,luminous intensity (https://app.notion.com/p/luminous-intensity-cb38b21d289149768d1ba6a3da6db5bc?pvs=21)
+T,$T$,"thermodynamic temperature (https://app.notion.com/p/thermodynamic-temperature-3563a23de696430dba1318bc426334f3?pvs=21), period duration (https://app.notion.com/p/period-duration-3c0b24cf917a80b5ba2ae32422434844?pvs=21), time constant (https://app.notion.com/p/time-constant-3c0b24cf917a8060b1fcce89ecf3fd8a?pvs=21)"
+m,$m$,mass (https://app.notion.com/p/mass-3e1ff023e9d445899881756103f798f5?pvs=21)
+t,$t$,duration (https://app.notion.com/p/duration-3639ccb0ce424e6eac600df6c261ab15?pvs=21)
+S,$S$,area (https://app.notion.com/p/area-3c0b24cf917a80948cf9df8690dcfe64?pvs=21)
+A,$A$,area (https://app.notion.com/p/area-3c0b24cf917a80948cf9df8690dcfe64?pvs=21)
+kappa,$\kappa$,curvature (https://app.notion.com/p/curvature-3c0b24cf917a800d910ae19f93d69212?pvs=21)
+Delta vector r,$\Delta {\boldsymbol r}$,displacement (https://app.notion.com/p/displacement-3c0b24cf917a807a8266c0d59f1ad578?pvs=21)
+vector r,${\boldsymbol r}$,position vector (https://app.notion.com/p/position-vector-3c0b24cf917a8009b24dc1f380c57be9?pvs=21)
+rho,$\rho$,"radial distance (https://app.notion.com/p/radial-distance-3c0b24cf917a8054bf0cf1247a03a76a?pvs=21), radius of curvature (https://app.notion.com/p/radius-of-curvature-3c0b24cf917a80fd946dfc558ccee9cd?pvs=21)"
+r sub Q,${\boldsymbol r}_Q$,radial distance (https://app.notion.com/p/radial-distance-3c0b24cf917a8054bf0cf1247a03a76a?pvs=21)
+s,$s$,path length (https://app.notion.com/p/path-length-3c0b24cf917a8060b327d73155cc8440?pvs=21)
+R,$R$,radius (https://app.notion.com/p/radius-3c0b24cf917a80398d37d9478b4f3118?pvs=21)
+r,$r$,"radius (https://app.notion.com/p/radius-3c0b24cf917a80398d37d9478b4f3118?pvs=21), distance (https://app.notion.com/p/distance-3c0b24cf917a807889e2f4a8cc76a6ea?pvs=21)"
+D,$D$,diameter (https://app.notion.com/p/diameter-3c0b24cf917a802a821ddc88b63514d6?pvs=21)
+delta,$\delta$,"thickness (https://app.notion.com/p/thickness-3c0b24cf917a80adb1b9e5b7be0f7fd1?pvs=21), damping coefficient (https://app.notion.com/p/damping-coefficient-3c0b24cf917a80428cead16a5a83c19b?pvs=21)"
+d,$d$,"diameter (https://app.notion.com/p/diameter-3c0b24cf917a802a821ddc88b63514d6?pvs=21), distance (https://app.notion.com/p/distance-3c0b24cf917a807889e2f4a8cc76a6ea?pvs=21), thickness (https://app.notion.com/p/thickness-3c0b24cf917a80adb1b9e5b7be0f7fd1?pvs=21)"
+H,$H$,height (https://app.notion.com/p/height-3c0b24cf917a805a91d6c10c8d76471d?pvs=21)
+h,$h$,height (https://app.notion.com/p/height-3c0b24cf917a805a91d6c10c8d76471d?pvs=21)
+B,$B$,width (https://app.notion.com/p/width-3c0b24cf917a80dda43bc3e89d696923?pvs=21)
+b,$b$,width (https://app.notion.com/p/width-3c0b24cf917a80dda43bc3e89d696923?pvs=21)
+psi,$\psi$,
+N,$N$,rotation (https://app.notion.com/p/rotation-3c0b24cf917a8051a754d0ffc137578e?pvs=21)
+tau,$\tau$,time constant (https://app.notion.com/p/time-constant-3c0b24cf917a8060b1fcce89ecf3fd8a?pvs=21)
+vector alpha,${\boldsymbol \alpha}$,angular acceleration (https://app.notion.com/p/angular-acceleration-3c0b24cf917a80f5ad3cdb2352dd33df?pvs=21)
+vector omega,${\boldsymbol \omega}$,angular velocity (https://app.notion.com/p/angular-velocity-3c0b24cf917a8008b79eddd4f544ea28?pvs=21)
+vector a,${\boldsymbol a}$,acceleration (https://app.notion.com/p/acceleration-930a29bda1dd4636ba0a2fb756f7a81b?pvs=21)
+v,$v$,"speed (https://app.notion.com/p/speed-3bfb24cf917a80358670d4ebb7300133?pvs=21), phase velocity (https://app.notion.com/p/phase-velocity-3c0b24cf917a8014aafdd2ab7d3b7078?pvs=21)"
+(v),$(v)$,velocity (https://app.notion.com/p/velocity-7588f9e6bb1d437e90087ee207cfcfbd?pvs=21)
+bold v,${\boldsymbol v}$,velocity (https://app.notion.com/p/velocity-7588f9e6bb1d437e90087ee207cfcfbd?pvs=21)
+Omega,$\Omega$,solid angular measure (https://app.notion.com/p/solid-angular-measure-c47e246c4418476795cf05f4699364c4?pvs=21)
+eta,$\eta$,rotational frequency (https://app.notion.com/p/rotational-frequency-3c0b24cf917a8048982eff8488ec9d9c?pvs=21)
+nu,$\nu$,frequency (https://app.notion.com/p/frequency-e5df97e5bc5e4bf5a508a7e2d2ae5411?pvs=21)
+f,$f$,frequency (https://app.notion.com/p/frequency-e5df97e5bc5e4bf5a508a7e2d2ae5411?pvs=21)
+omega,$\omega$,angular frequency (https://app.notion.com/p/angular-frequency-3c0b24cf917a802791a9c0e7f545a8e6?pvs=21)
+lambda,$\lambda$,wavelength (https://app.notion.com/p/wavelength-3c0b24cf917a800985adc6f1a9c69ed8?pvs=21)
+sigma,$\sigma$,repetency (https://app.notion.com/p/repetency-3c0b24cf917a8019b12afd8eca0767c8?pvs=21)
+v bar,$\bar{v}$,repetency (https://app.notion.com/p/repetency-3c0b24cf917a8019b12afd8eca0767c8?pvs=21)
+vector k,${\boldsymbol k}$,wave vector (https://app.notion.com/p/wave-vector-3c0b24cf917a800296cfd473c1d5d772?pvs=21)
+k,$k$,angular repetency (https://app.notion.com/p/angular-repetency-3c0b24cf917a802882c0f90a754bf853?pvs=21)
+c,$c$,phase velocity (https://app.notion.com/p/phase-velocity-3c0b24cf917a8014aafdd2ab7d3b7078?pvs=21)
+c sub phi,$c_\phi$,phase velocity (https://app.notion.com/p/phase-velocity-3c0b24cf917a8014aafdd2ab7d3b7078?pvs=21)
+v sub phi,$v_\phi$,phase velocity (https://app.notion.com/p/phase-velocity-3c0b24cf917a8014aafdd2ab7d3b7078?pvs=21)
+c sub g,$c_{\rm g}$,group velocity (https://app.notion.com/p/group-velocity-3c0b24cf917a808a8690db827c5d9a58?pvs=21)
+v sub g,$v_{\rm g}$,group velocity (https://app.notion.com/p/group-velocity-3c0b24cf917a808a8690db827c5d9a58?pvs=21)
+Lambda,$\Lambda$,logarithmic decrement (https://app.notion.com/p/logarithmic-decrement-3c0b24cf917a80bbae7ae130bd442258?pvs=21)
