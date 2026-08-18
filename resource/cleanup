@@ -1,0 +1,4 @@
+#!/bin/sh
+
+rm -f *ExportBlock-*.zip
+rm -f "ISQ & SI Reference"*.md

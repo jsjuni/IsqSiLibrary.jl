@@ -1,0 +1,5 @@
+#!/bin/sh
+
+unzip $1
+unzip -o ExportBlock*.zip
+
