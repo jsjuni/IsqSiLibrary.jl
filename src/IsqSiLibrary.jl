@@ -139,6 +139,7 @@ module IsqSiLibrary
             d["description_iri_stem"] = ontology_data["iri_stem"]
             d["vocabulary_iri_stem"] = ontology_data["companion_iri_stem"]
             d["type"] = quantity_data["Type"]
+            d["item"] = quantity_data["Item"]
             d["description"] = quantity_data["Description"]
             d["symbol"] = quantity_data["Symbol"]
             d["dimension_symbol"] = quantity_data["Dimension Symbol"]

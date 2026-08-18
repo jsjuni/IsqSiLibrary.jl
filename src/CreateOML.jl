@@ -14,6 +14,7 @@ module Main
     const DC_DESCRIPTION = "<http://purl.org/dc/elements/1.1/description>"
     const DC_SOURCE = "<http://purl.org/dc/elements/1.1/source>"
     const DC_TITLE = "<http://purl.org/dc/elements/1.1/title>"
+    const DC_IDENTIFIER = "<http://purl.org/dc/elements/1.1/identifier>"
 
     # rdf vocabulary
 
@@ -235,6 +236,12 @@ module Main
                 namespace_base, quantity_data["description_iri_stem"], separator
             )
             quantity_iri = description_ns * quantity_id
+
+            # add identifier annotation
+
+            push!(stage_1,
+                add_annotation(description_iri, quantity_iri, DC_IDENTIFIER, quantity_data["item"])
+            )
 
             # create quantity classes
 
