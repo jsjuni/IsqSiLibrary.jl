@@ -1,0 +1,3 @@
+#!/bin/sh
+
+(cd ../build; zip ../resource/bipm-iso-fixed.zip oml/bipm.org/jcgm/vim3-[dv].oml  oml/iso.org/iso-80000/1-[dv].oml)
