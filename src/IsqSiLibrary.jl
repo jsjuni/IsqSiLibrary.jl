@@ -27,6 +27,16 @@ module IsqSiLibrary
         "description bundle" => ["vocabulary bundle", "description"]
     )
 
+    const BASE_UNITS = Dict(
+        "T" => "s",
+        "L" => "m",
+        "M" => "kg",
+        "I" => "A",
+        "Θ" => "K",
+        "N" => "mol",
+        "J" => "cd"
+    )
+
     struct SpaceCase <: AbstractNamingConvention end
 
     function NamingConventions.encode(::Type{SpaceCase}, v::AbstractString)
@@ -47,6 +57,10 @@ module IsqSiLibrary
 
     function extract_paren_text(string)
         match(r"\(([^)]*)\)", string)[1]
+    end
+
+    function base_expression(dim_string)
+        foldl((s, (dim, unit)) -> replace(s, dim => unit), BASE_UNITS, init = dim_string)
     end
 
     export parse_csv_source
@@ -178,6 +192,8 @@ module IsqSiLibrary
                 quantity = instance_name(remove_paren_text(quantity_string))
                 d["quantity"] = quantity
                 d["unit_class"] = NamingConventions.convert(SnakeCase, PascalCase, quantity) * "Unit"
+                quantity_id = instance_name(quantity)
+                d["expression_calculated"] = base_expression(quantity_instances[quantity_id]["dimension_symbol"])
             end
             name = instance_name(unit)
             unit_instances[name] = d

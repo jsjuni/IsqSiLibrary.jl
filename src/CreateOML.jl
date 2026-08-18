@@ -44,6 +44,8 @@ module Main
     const IS_BASE_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isBaseUnitFor>"
     const IS_DERIVED_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isDerivedUnitFor>"
 
+    const HAS_BASE_UNIT_EXPRESSION = "<http://iso.org/iso-80000/1-v#hasBaseUnitExpression>"
+
     #
 
     const PLURAL = Dict("quantity" => "quantities", "unit" => "units", "value" => "values")
@@ -316,6 +318,13 @@ module Main
                 )
             end
 
+            # assert base unit expression for derived units
+
+            if unit_data["type"] != "Base" # some "Supplemental" and "Jenkins" junk in there
+                push!(stage_1,
+                    add_assertion(u_description_iri, unit_iri, HAS_BASE_UNIT_EXPRESSION, unit_data["expression_calculated"])
+                )
+            end
 
         end
 
