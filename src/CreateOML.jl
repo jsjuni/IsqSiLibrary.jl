@@ -105,13 +105,14 @@ module Main
             add_annotation(description_iri, instance_iri, RDFS_LABEL, instance_data["name"]),
             add_annotation(description_iri, instance_iri, DC_DESCRIPTION, instance_data["description"]),
             add_assertion(description_iri, instance_iri, has_identifier, instance_data["name"]),
-       ])
+        ])
 
-        symbol = instance_data["symbol"]
-        if !isnothing(symbol)
-            push!(operations,
-                add_assertion(description_iri, instance_iri, HAS_SYMBOL, instance_data["symbol"])
-            )
+        if haskey(instance_data, "symbols")
+            for symbol in instance_data["symbols"]
+                push!(operations,
+                    add_assertion(description_iri, instance_iri, HAS_SYMBOL, symbol)
+                )
+            end
         end
     
         if haskey(instance_data, "alternate_names")

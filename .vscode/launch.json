@@ -32,6 +32,7 @@
                 "--quantities-source", "ISQ Quantities e1b3e75b0f85444aa01339cbc9e867df.csv",
                 "--units-source", "SI Units b419c70b1bf040e3b87a04a900378d01.csv",
                 "--prefixes-source", "SI Prefixes 00b23fe2521d407688f118fd44e4e1f1.csv",
+                "--symbols-source", "Quantity Symbols 3c0b24cf917a807a8b41fd799eb11f3b.csv",
                 "--output", "${workspaceFolder}/build/json/isq-si.json"
             ]
         },

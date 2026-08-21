@@ -143,7 +143,7 @@ module IsqSiLibrary
     end
 
     export construct_quantity_instances
-    function construct_quantity_instances(quantities, ontologies)
+    function construct_quantity_instances(quantities, ontologies, symbols)
         quantity_instances = initialize_dictionary()
         for (quantity, quantity_data) in quantities
             d = initialize_dictionary()
@@ -158,8 +158,10 @@ module IsqSiLibrary
             d["type"] = quantity_data["Type"]
             d["item"] = quantity_data["Item"]
             d["description"] = quantity_data["Description"]
-            d["symbol"] = quantity_data["Symbol"]
-            d["dimension_symbol"] = quantity_data["Dimension Symbol"]
+            symbol_field = quantity_data["Symbol"]
+            symbol_keys = ismissing(symbol_field) ? [] : map(remove_paren_text, split(symbol_field, r"\s*,\s*"))
+            d["symbols"] = map(k -> symbols[k]["LaTeX"], symbol_keys)
+            d["dimension_symbol"] = "[to be constructed]"
             name = instance_name(quantity)
             d["quantity_class"] = NamingConventions.convert(SnakeCase, PascalCase, name)
             d["unit_class"] = "$(d["quantity_class"])Unit"
@@ -188,7 +190,7 @@ module IsqSiLibrary
             if d["type"] == "Derived"
                 d["expression"] = unit_data["Expressed In Base Units"]
             end
-            d["description"] = unit_data["Definition"]
+            d["description"] = "[to be deleted]"
             d["symbol"] = unit_data["Symbol"]
             quantity_string = unit_data["ISQ Quantities"]
             if !ismissing(quantity_string)

@@ -33,6 +33,10 @@ module Main
                 help = "prefixes source file (JSON)"
                 arg_type = String
                 required = true
+            "--symbols-source"
+                help = "symbols source file (JSON)"
+                arg_type = String
+                required = true
            "--output"
                 help = "Output JSON file (default: output.json)"
                 arg_type = String
@@ -72,7 +76,10 @@ module Main
         @info "$(now()) loading prefixes source $(args["prefixes-source"])"
         prefixes_csv = load_csv_document(args["sources-path-prefix"], args["prefixes-source"])
 
-        #
+        @info "$(now()) loading symbols source $(args["symbols-source"])"
+        symbols_csv = load_csv_document(args["sources-path-prefix"], args["symbols-source"])
+
+       #
         # build dictionaries of input data
         #
 
@@ -92,6 +99,9 @@ module Main
         @info "$(now()) building prefixes dictionary"
         prefixes = table_to_dict(prefixes_csv, "Prefix")
 
+        @info "$(now()) building symbols dictionary"
+        symbols = table_to_dict(symbols_csv, "Name")
+
         #
         # create ontologies and bundles
         #
@@ -109,7 +119,7 @@ module Main
         #
 
         @info "$(now()) create quantity instances"
-        quantity_instances = construct_quantity_instances(quantities, ontologies)
+        quantity_instances = construct_quantity_instances(quantities, ontologies, symbols)
         knowledge["quantity_instances"] = quantity_instances
 
         #
@@ -124,6 +134,7 @@ module Main
         # write output
         #
 
+        @info "$(now()) saving $(length(quantity_instances)) quantities, $(length(unit_instances)) units"
         output = (args["output"] == "" ? stdout : open(args["output"], "w"))
         JSON.json(output, knowledge, pretty = true)
         
