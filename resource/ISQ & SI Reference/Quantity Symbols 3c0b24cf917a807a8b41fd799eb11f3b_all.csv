@@ -1,4 +1,4 @@
-﻿Name,LaTeX,Last edited by,Last edited by 1,📐 ISQ Quantities
+﻿Name,LaTeX,Last edited by,Last edited time,📐 ISQ Quantities
 I,$I$,Steven Jenkins,"August 18, 2026 9:40 AM","electric current (https://app.notion.com/p/electric-current-2ec50445913e4114b8d129774c98cf40?pvs=21), length (https://app.notion.com/p/length-788561f5dc3b4847b77dac2496bbf737?pvs=21)"
 L,$L$,Steven Jenkins,"August 18, 2026 9:41 AM",length (https://app.notion.com/p/length-788561f5dc3b4847b77dac2496bbf737?pvs=21)
 b,$b$,Steven Jenkins,"August 18, 2026 10:03 AM",width (https://app.notion.com/p/width-3c0b24cf917a80dda43bc3e89d696923?pvs=21)
@@ -17,7 +17,7 @@ vector r,${\boldsymbol r}$,Steven Jenkins,"August 18, 2026 10:32 AM",position ve
 Delta vector r,$\Delta {\boldsymbol r}$,Steven Jenkins,"August 18, 2026 10:32 AM",displacement (https://app.notion.com/p/displacement-3c0b24cf917a807a8266c0d59f1ad578?pvs=21)
 kappa,$\kappa$,Steven Jenkins,"August 18, 2026 10:00 AM","curvature (https://app.notion.com/p/curvature-3c0b24cf917a800d910ae19f93d69212?pvs=21), compressibility (https://app.notion.com/p/compressibility-3c2b24cf917a80eca66ae115b6dd9df5?pvs=21)"
 A,$A$,Steven Jenkins,"August 18, 2026 10:00 AM","area (https://app.notion.com/p/area-3c0b24cf917a80948cf9df8690dcfe64?pvs=21), mechanical work (https://app.notion.com/p/mechanical-work-484e3ebc766846ad841853990b0e3526?pvs=21)"
-S,$S$,Steven Jenkins,"August 18, 2026 10:00 AM",area (https://app.notion.com/p/area-3c0b24cf917a80948cf9df8690dcfe64?pvs=21)
+S,$S$,Steven Jenkins,"August 20, 2026 11:30 PM","area (https://app.notion.com/p/area-3c0b24cf917a80948cf9df8690dcfe64?pvs=21), action (https://app.notion.com/p/action-3c3b24cf917a80d2922dc40c3efd73a5?pvs=21)"
 t,$t$,Steven Jenkins,"August 18, 2026 9:59 AM",duration (https://app.notion.com/p/duration-3639ccb0ce424e6eac600df6c261ab15?pvs=21)
 m,$m$,Steven Jenkins,"August 18, 2026 9:59 AM",mass (https://app.notion.com/p/mass-3e1ff023e9d445899881756103f798f5?pvs=21)
 T,$T$,Steven Jenkins,"August 18, 2026 9:57 AM","thermodynamic temperature (https://app.notion.com/p/thermodynamic-temperature-3563a23de696430dba1318bc426334f3?pvs=21), period duration (https://app.notion.com/p/period-duration-3c0b24cf917a80b5ba2ae32422434844?pvs=21), time constant (https://app.notion.com/p/time-constant-3c0b24cf917a8060b1fcce89ecf3fd8a?pvs=21), torque (https://app.notion.com/p/torque-3c2b24cf917a80e58d2ce38526bec133?pvs=21)"
@@ -92,10 +92,11 @@ mu_s,$\mu_{\mathrm s}$,Steven Jenkins,"August 20, 2026 1:31 PM",static friction 
 mu,$\mu$,Steven Jenkins,"August 20, 2026 1:40 PM",kinetic friction factor (https://app.notion.com/p/kinetic-friction-factor-3c2b24cf917a80eaa7abd87a4dfc3d19?pvs=21)
 (f),$(f)$,Steven Jenkins,"August 20, 2026 1:40 PM",kinetic friction factor (https://app.notion.com/p/kinetic-friction-factor-3c2b24cf917a80eaa7abd87a4dfc3d19?pvs=21)
 C_rr,$C_{\mathrm rr}$,Steven Jenkins,"August 20, 2026 2:03 PM",rolling resistance factor (https://app.notion.com/p/rolling-resistance-factor-3c2b24cf917a80d1be26c22bc9f87ab0?pvs=21)
-C_D,$C_{\mathrm D}$,Steven Jenkins,"August 20, 2026 2:08 PM",drag coefficient (https://app.notion.com/p/drag-coefficient-3c2b24cf917a80b4bf23fe2f089155c8?pvs=21)
+c_D,$c_{\mathrm D}$,Steven Jenkins,"August 20, 2026 11:34 PM",drag coefficient (https://app.notion.com/p/drag-coefficient-3c2b24cf917a80b4bf23fe2f089155c8?pvs=21)
 P,$P$,Steven Jenkins,"August 20, 2026 3:17 PM",power (https://app.notion.com/p/power-6b46a58f6c09450e8f06c8a259a7f386?pvs=21)
 E_p,$E_{\mathrm p}$,Steven Jenkins,"August 20, 2026 3:33 PM",potential energy (https://app.notion.com/p/potential-energy-3c0b24cf917a808b8862f519aa141277?pvs=21)
 E_k,$E_{\mathbf k}$,Steven Jenkins,"August 20, 2026 3:37 PM",kinetic energy (https://app.notion.com/p/kinetic-energy-3c0b24cf917a80ebaeddd50a4a76da51?pvs=21)
 W,$W$,Steven Jenkins,"August 20, 2026 3:40 PM","mechanical energy (https://app.notion.com/p/mechanical-energy-3c0b24cf917a80a9a58bd348c1741848?pvs=21), mechanical work (https://app.notion.com/p/mechanical-work-484e3ebc766846ad841853990b0e3526?pvs=21)"
 j_m,$\boldsymbol j_m$,Steven Jenkins,"August 20, 2026 3:56 PM",mass flow (https://app.notion.com/p/mass-flow-3c2b24cf917a80a68b80f5bb11576eb6?pvs=21)
 q_m,$q_m$,Steven Jenkins,"August 20, 2026 4:15 PM","mass flow rate (https://app.notion.com/p/mass-flow-rate-3c2b24cf917a80ae91b7ccdb72d9ddff?pvs=21), mass change rate (https://app.notion.com/p/mass-change-rate-3c2b24cf917a806f8dc4f5b857a5df21?pvs=21)"
+q_v,$q_{\mathrm v}$,Steven Jenkins,"August 20, 2026 11:21 PM",volume flow rate (https://app.notion.com/p/volume-flow-rate-3c3b24cf917a80b0950dfc5bb3685f06?pvs=21)
