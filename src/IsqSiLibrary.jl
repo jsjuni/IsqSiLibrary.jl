@@ -190,15 +190,15 @@ module IsqSiLibrary
             if d["type"] == "Derived"
                 d["expression"] = unit_data["Expressed In Base Units"]
             end
-            d["description"] = "[to be deleted]"
             d["symbol"] = unit_data["Symbol"]
             quantity_string = unit_data["ISQ Quantities"]
             if !ismissing(quantity_string)
-                quantity = instance_name(remove_paren_text(quantity_string))
-                d["quantity"] = quantity
-                d["unit_class"] = NamingConventions.convert(SnakeCase, PascalCase, quantity) * "Unit"
-                quantity_id = instance_name(quantity)
-                d["expression_calculated"] = base_expression(quantity_instances[quantity_id]["dimension_symbol"])
+                d["quantity"] = map(
+                    function(q)
+                        quantity = remove_paren_text(q)
+                        NamingConventions.convert(SpaceCase, SnakeCase, quantity)
+                    end, split(quantity_string, r"\s*,\s*")
+                )
             end
             name = instance_name(unit)
             unit_instances[name] = d

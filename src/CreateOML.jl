@@ -15,6 +15,7 @@ module Main
     const DC_SOURCE = "<http://purl.org/dc/elements/1.1/source>"
     const DC_TITLE = "<http://purl.org/dc/elements/1.1/title>"
     const DC_IDENTIFIER = "<http://purl.org/dc/elements/1.1/identifier>"
+    const DC_TYPE = "<http://purl.org/dc/elements/1.1/type>"
 
     # rdf vocabulary
 
@@ -103,7 +104,6 @@ module Main
             create_instance(description_iri, instance_id),
             add_assertion(description_iri, instance_iri, RDF_TYPE, base_or_derived),
             add_annotation(description_iri, instance_iri, RDFS_LABEL, instance_data["name"]),
-            add_annotation(description_iri, instance_iri, DC_DESCRIPTION, instance_data["description"]),
             add_assertion(description_iri, instance_iri, has_identifier, instance_data["name"]),
         ])
 
@@ -247,11 +247,12 @@ module Main
             )
             quantity_iri = description_ns * quantity_id
 
-            # add identifier annotation
+            # add identifier annotation and description
 
-            push!(stage_1,
-                add_annotation(description_iri, quantity_iri, DC_IDENTIFIER, quantity_data["item"])
-            )
+            append!(stage_1, [
+                add_annotation(description_iri, quantity_iri, DC_IDENTIFIER, quantity_data["item"]),
+                add_annotation(description_iri, quantity_iri, DC_DESCRIPTION, quantity_data["description"])
+            ])
 
             # create quantity classes
 
@@ -302,35 +303,34 @@ module Main
                 )
             )
 
-            # assert unit class of instance
+            (description_iri, description_ns) = ontology_iri_ns(
+                namespace_base, unit_data["description_iri_stem"], separator
+            )
+            unit_iri = description_ns * unit_id
+
+            # assert unit classes of instance
             
-            @info "$(now())     assert $unit_id type $(unit_data["unit_class"])"
-
-            # assert "is unit for" relation if appropriate
-
-            if haskey(unit_data, "quantity")
-                relation = unit_data["type"] == "Base" ? IS_BASE_UNIT_FOR : IS_DERIVED_UNIT_FOR
-                (u_description_iri, u_description_ns) = ontology_iri_ns(
-                    namespace_base, unit_data["description_iri_stem"], separator
+            for quantity in unit_data["quantity"]
+                quantity_data = input["quantity_instances"][quantity]
+                (vocabulary_iri, vocabulary_ns) = ontology_iri_ns(
+                    namespace_base, quantity_data["vocabulary_iri_stem"], separator)
+                unit_class = Dict(
+                    "datatypeIri" => "http://www.w3.org/2001/XMLSchema#anyURI",
+                    "value" => vocabulary_iri * quantity_data["unit_class"]
                 )
-                quantity_id = unit_data["quantity"]
-                quantity_data = input["quantity_instances"][quantity_id]
-                (q_description_iri, q_description_ns) = ontology_iri_ns(
-                    namespace_base, quantity_data["description_iri_stem"], separator
-                )
-                unit_iri = u_description_ns * unit_id
-                quantity_iri = q_description_ns * quantity_id
-                @info "$(now())     assert $unit_id unit for relation to $quantity_id"
+            
+                @info "$(now())     assert $unit_id type $(unit_class)"
                 push!(stage_1,
-                    add_assertion(u_description_iri, unit_iri, relation, quantity_iri)
+                    add_annotation(description_iri, unit_iri, DC_TYPE, unit_class)
                 )
             end
 
+ 
             # assert base unit expression for derived units
 
             if unit_data["type"] != "Base" # some "Supplemental" and "Jenkins" junk in there
                 push!(stage_1,
-                    add_assertion(u_description_iri, unit_iri, HAS_BASE_UNIT_EXPRESSION, unit_data["expression_calculated"])
+                    add_assertion(description_iri, unit_iri, HAS_BASE_UNIT_EXPRESSION, unit_data["expression"])
                 )
             end
 
