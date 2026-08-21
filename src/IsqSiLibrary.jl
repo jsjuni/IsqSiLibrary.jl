@@ -66,6 +66,16 @@ module IsqSiLibrary
         )
     end
 
+    export companion_iri_stem
+    function companion_iri_stem(stem, ontologies)
+        for ontology in values(ontologies)
+            if stem == ontology["iri_stem"]
+                return ontology["companion_iri_stem"]
+            end
+        end
+        return nothing
+    end
+
     export parse_csv_source
     function parse_csv_source(path)
         CSV.read(path, DataFrame)
@@ -181,11 +191,6 @@ module IsqSiLibrary
         for (unit, unit_data) in units
             d = initialize_dictionary()
             d["name"] = unit
-            document = remove_paren_text(unit_data["Defining Document"])
-            ontology_key = "$document description"
-            ontology_data = ontologies[ontology_key]
-            d["description_iri_stem"] = ontology_data["iri_stem"]
-            d["vocabulary_iri_stem"] = ontology_data["companion_iri_stem"]
             d["type"] = unit_data["Type"]
             if d["type"] == "Derived"
                 d["expression"] = unit_data["Expressed In Base Units"]
@@ -193,12 +198,20 @@ module IsqSiLibrary
             d["symbol"] = unit_data["Symbol"]
             quantity_string = unit_data["ISQ Quantities"]
             if !ismissing(quantity_string)
+                qs = map(remove_paren_text, split(quantity_string, r"\s*,\s*"))
                 d["quantity"] = map(
                     function(q)
-                        quantity = remove_paren_text(q)
-                        NamingConventions.convert(SpaceCase, SnakeCase, quantity)
-                    end, split(quantity_string, r"\s*,\s*")
+                        NamingConventions.convert(SpaceCase, SnakeCase, q)
+                    end,
+                    qs
                 )
+                d["description_iri_stem"] = unique(map(
+                    function(q)
+                        quantity_data = quantity_instances[q]
+                        quantity_data["description_iri_stem"]
+                    end,
+                    d["quantity"]
+                ))
             end
             name = instance_name(unit)
             unit_instances[name] = d

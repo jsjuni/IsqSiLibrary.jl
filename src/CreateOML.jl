@@ -8,6 +8,10 @@ module Main
     using OrderedCollections
     using OMLCodeAPI
     
+    # xsd vocabulary
+
+    const XSD_ANYURI = "<http://www.w3.org/2001/XMLSchema#anyURI>"
+    
     # dc vocabulary
 
     const DC_CREATOR = "<http://purl.org/dc/elements/1.1/creator>"
@@ -94,10 +98,10 @@ module Main
         (iri, ns)
     end
 
-    function create_quantity_or_unit_instance(instance_data, instance_id, namespace_base, has_identifier, base_or_derived, separator)
+    function create_quantity_or_unit_instance(instance_data, description_iri_stem, instance_id, namespace_base, has_identifier, base_or_derived, separator)
         operations = []
         (description_iri, description_ns) = ontology_iri_ns(
-            namespace_base, instance_data["description_iri_stem"], separator
+            namespace_base, description_iri_stem, separator
         )
         instance_iri = description_ns * instance_id
         append!(operations, [
@@ -231,6 +235,7 @@ module Main
             append!(stage_1,
                 create_quantity_or_unit_instance(
                     quantity_data,
+                    quantity_data["description_iri_stem"],
                     quantity_id,
                     namespace_base,
                     HAS_QUANTITY_IDENTIFIER,
@@ -288,52 +293,57 @@ module Main
 
         @info "$(now()) process units"
         for (unit_id, unit_data) in input["unit_instances"]
-            @info "$(now())   $(unit_data["description_iri_stem"]) $unit_id"
+            for description_iri_stem = unit_data["description_iri_stem"]
+                @info "$(now())   $(description_iri_stem) $unit_id"
 
-            # create quantity instance
+                # create quantity instance
 
-            append!(stage_1,
-                create_quantity_or_unit_instance(
-                    unit_data,
-                    unit_id,
-                    namespace_base,
-                    HAS_UNIT_IDENTIFIER,
-                    unit_data["type"] == "Base" ? SI_BASE_UNIT : SI_DERIVED_UNIT,
-                    separator
+                append!(stage_1,
+                    create_quantity_or_unit_instance(
+                        unit_data,
+                        description_iri_stem,
+                        unit_id,
+                        namespace_base,
+                        HAS_UNIT_IDENTIFIER,
+                        unit_data["type"] == "Base" ? SI_BASE_UNIT : SI_DERIVED_UNIT,
+                        separator
+                    )
                 )
-            )
 
-            (description_iri, description_ns) = ontology_iri_ns(
-                namespace_base, unit_data["description_iri_stem"], separator
-            )
-            unit_iri = description_ns * unit_id
+                (description_iri, description_ns) = ontology_iri_ns(
+                    namespace_base, description_iri_stem, separator
+                )
+                unit_iri = description_ns * unit_id
 
-            # assert unit classes of instance
-            
-            for quantity in unit_data["quantity"]
-                quantity_data = input["quantity_instances"][quantity]
-                (vocabulary_iri, vocabulary_ns) = ontology_iri_ns(
-                    namespace_base, quantity_data["vocabulary_iri_stem"], separator)
-                unit_class = Dict(
-                    "datatypeIri" => "http://www.w3.org/2001/XMLSchema#anyURI",
-                    "value" => vocabulary_iri * quantity_data["unit_class"]
-                )
-            
-                @info "$(now())     assert $unit_id type $(unit_class)"
-                push!(stage_1,
-                    add_annotation(description_iri, unit_iri, DC_TYPE, unit_class)
-                )
+                # assert unit classes of instance
+                
+                vocabulary_iri_stem = companion_iri_stem(description_iri_stem, input["ontologies"])
+
+                for quantity in unit_data["quantity"]
+                    quantity_data = input["quantity_instances"][quantity]
+                    if vocabulary_iri_stem == quantity_data["vocabulary_iri_stem"]
+                        (vocabulary_iri, vocabulary_ns) = ontology_iri_ns(
+                            namespace_base, vocabulary_iri_stem, separator)
+                        unit_class = Dict(
+                            "datatypeIri" => XSD_ANYURI,
+                            "value" => vocabulary_iri * quantity_data["unit_class"]
+                        )
+                    
+                        @info "$(now())     assert $unit_id type $(quantity_data["unit_class"])"
+                        push!(stage_1,
+                            add_annotation(description_iri, unit_iri, DC_TYPE, unit_class)
+                        )
+                    end
+                end
+
+                # assert base unit expression for derived units
+
+                if unit_data["type"] != "Base" # some "Supplemental" and "Jenkins" junk in there
+                    push!(stage_1,
+                        add_assertion(description_iri, unit_iri, HAS_BASE_UNIT_EXPRESSION, unit_data["expression"])
+                    )
+                end
             end
-
- 
-            # assert base unit expression for derived units
-
-            if unit_data["type"] != "Base" # some "Supplemental" and "Jenkins" junk in there
-                push!(stage_1,
-                    add_assertion(description_iri, unit_iri, HAS_BASE_UNIT_EXPRESSION, unit_data["expression"])
-                )
-            end
-
         end
 
         # update server
