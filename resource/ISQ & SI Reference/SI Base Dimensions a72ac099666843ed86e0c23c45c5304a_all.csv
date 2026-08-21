@@ -1,8 +1,8 @@
-﻿Base Dimension,Dimension Symbol,ISQ Base Quantity,SI Base Unit,Unit Symbol
-time,T,duration (https://app.notion.com/p/duration-3639ccb0ce424e6eac600df6c261ab15?pvs=21),second,s
-electric current,I,electric current (https://app.notion.com/p/electric-current-2ec50445913e4114b8d129774c98cf40?pvs=21),ampere,A
-length,L,length (https://app.notion.com/p/length-788561f5dc3b4847b77dac2496bbf737?pvs=21),metre,m
-thermodynamic temperature,Θ,thermodynamic temperature (https://app.notion.com/p/thermodynamic-temperature-3563a23de696430dba1318bc426334f3?pvs=21),kelvin,K
-mass,M,mass (https://app.notion.com/p/mass-3e1ff023e9d445899881756103f798f5?pvs=21),kilogram,kg
-amount of substance,N,amount of substance (https://app.notion.com/p/amount-of-substance-891f7d9c5ab149998297aa54a69c2797?pvs=21),mole,mol
-luminous intensity,J,luminous intensity (https://app.notion.com/p/luminous-intensity-cb38b21d289149768d1ba6a3da6db5bc?pvs=21),candela,cd
+﻿Base Dimension,Dimension Symbol,ISQ Base Quantity,Last edited by,Last edited time,SI Base Unit,Unit Symbol
+time,T,duration (https://app.notion.com/p/duration-3639ccb0ce424e6eac600df6c261ab15?pvs=21),Steven Jenkins,"August 17, 2026 9:24 PM",second,s
+electric current,I,electric current (https://app.notion.com/p/electric-current-2ec50445913e4114b8d129774c98cf40?pvs=21),Steven Jenkins,"August 17, 2026 9:24 PM",ampere,A
+length,L,length (https://app.notion.com/p/length-788561f5dc3b4847b77dac2496bbf737?pvs=21),Steven Jenkins,"August 17, 2026 9:24 PM",metre,m
+thermodynamic temperature,Θ,thermodynamic temperature (https://app.notion.com/p/thermodynamic-temperature-3563a23de696430dba1318bc426334f3?pvs=21),Steven Jenkins,"August 17, 2026 9:24 PM",kelvin,K
+mass,M,mass (https://app.notion.com/p/mass-3e1ff023e9d445899881756103f798f5?pvs=21),Steven Jenkins,"August 17, 2026 9:24 PM",kilogram,kg
+amount of substance,N,amount of substance (https://app.notion.com/p/amount-of-substance-891f7d9c5ab149998297aa54a69c2797?pvs=21),Steven Jenkins,"August 17, 2026 9:24 PM",mole,mol
+luminous intensity,J,luminous intensity (https://app.notion.com/p/luminous-intensity-cb38b21d289149768d1ba6a3da6db5bc?pvs=21),Steven Jenkins,"August 17, 2026 9:23 PM",candela,cd
