@@ -1,0 +1,8 @@
+#!/bin/sh
+
+BIPM=$HOME/git/TheBIPM/SI_Digital_Framework/knowledge_graphs
+RESOURCE=$PWD
+
+cd $BIPM
+rsync -av quantities SI_Reference_Point $RESOURCE/bipm.org/
+
