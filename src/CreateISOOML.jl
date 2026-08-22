@@ -144,7 +144,7 @@ module Main
                         ontology_data["prefix"],
                         args["path-base"]
                     ),
-                    add_annotation(ontology_iri, ontology_iri, IsqSiLibrary.DC_TITLE, ontology_id),
+                    add_annotation(ontology_iri, ontology_iri, DC_TITLE, ontology_id),
                     add_annotation(ontology_iri, ontology_iri, RDFS_LABEL, ontology_data["label"]),
                     add_annotation(ontology_iri, ontology_iri, DC_SOURCE, ontology_data["source"])
                 ])
