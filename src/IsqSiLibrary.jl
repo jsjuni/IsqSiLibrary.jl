@@ -7,6 +7,9 @@ module IsqSiLibrary
  
     using NamingConventions
 
+    const BIPM_ORG_SI = "bipm.org/jcgm/si-d"
+    const ISO_ORG_SI = "iso.org/si-d"
+
     const ONTOLOGY_TYPES = Dict(
         "vocabulary" => "v",
         "description" => "d"
@@ -190,28 +193,22 @@ module IsqSiLibrary
         unit_instances = initialize_dictionary()
         for (unit, unit_data) in units
             d = initialize_dictionary()
+            ds = unit_data["Defining Document"]
+            if !ismissing(ds)
+                document = remove_paren_text(ds)
+                d["document"] = document
+                d["description_iri_stem"] = document == "SI Brochure" ? BIPM_ORG_SI : ISO_ORG_SI
+            else
+                d["description_iri_stem"] = ISO_ORG_SI
+           end
             d["name"] = unit
             d["type"] = unit_data["Type"]
             if d["type"] == "Derived"
                 d["expression"] = unit_data["Expressed In Base Units"]
             end
-            d["symbol"] = unit_data["Symbol"]
-            quantity_string = unit_data["ISQ Quantities"]
-            if !ismissing(quantity_string)
-                qs = map(remove_paren_text, split(quantity_string, r"\s*,\s*"))
-                d["quantity"] = map(
-                    function(q)
-                        NamingConventions.convert(SpaceCase, SnakeCase, q)
-                    end,
-                    qs
-                )
-                d["description_iri_stem"] = unique(map(
-                    function(q)
-                        quantity_data = quantity_instances[q]
-                        quantity_data["description_iri_stem"]
-                    end,
-                    d["quantity"]
-                ))
+            symbol = unit_data["Symbol"]
+            if !ismissing(symbol)
+                d["symbol"] = symbol
             end
             name = instance_name(unit)
             unit_instances[name] = d
