@@ -7,8 +7,8 @@
         {
             "type": "julia",
             "request": "launch",
-            "name": "CreateOML.jl",
-            "program": "${workspaceFolder}/src/CreateOML.jl",
+            "name": "CreateISOOML.jl",
+            "program": "${workspaceFolder}/src/CreateISOOML.jl",
             "stopOnEntry": false,
             "args": [
                 "--creator", "J Steven Jenkins ORCID 0000-0002-0725-0884",

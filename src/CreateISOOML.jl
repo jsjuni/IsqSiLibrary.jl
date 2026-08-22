@@ -8,54 +8,6 @@ module Main
     using OrderedCollections
     using OMLCodeAPI
     
-    # xsd vocabulary
-
-    const XSD_ANYURI = "<http://www.w3.org/2001/XMLSchema#anyURI>"
-    
-    # dc vocabulary
-
-    const DC_CREATOR = "<http://purl.org/dc/elements/1.1/creator>"
-    const DC_DESCRIPTION = "<http://purl.org/dc/elements/1.1/description>"
-    const DC_SOURCE = "<http://purl.org/dc/elements/1.1/source>"
-    const DC_TITLE = "<http://purl.org/dc/elements/1.1/title>"
-    const DC_IDENTIFIER = "<http://purl.org/dc/elements/1.1/identifier>"
-    const DC_TYPE = "<http://purl.org/dc/elements/1.1/type>"
-
-    # rdf vocabulary
-
-    const RDF_TYPE = "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"
-
-    # rdfs vocabulary
-
-    const RDFS_LABEL = "<http://www.w3.org/2000/01/rdf-schema#label>"
-
-    # vim3 vocabulary
-
-    const IS_PROPERTY_OF = "<http://bipm.org/jcgm/vim3-v#isPropertyOf>"
-    const HAS_DIMENSION_SYMBOL = "<http://bipm.org/jcgm/vim3-v#hasDimensionSymbol>"
-
-    # iso 80000 vocabulary
-
-    const HAS_QUANTITY_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasQuantityIdentifier>"
-    const HAS_UNIT_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasUnitIdentifier>"
-    const HAS_SYMBOL = "<http://iso.org/iso-80000/1-v#hasSymbol>"
-
-    const ISQ_BASE_QUANTITY = "<http://iso.org/iso-80000/1-v#ISQBaseQuantity>"
-    const ISQ_DERIVED_QUANTITY = "<http://iso.org/iso-80000/1-v#ISQDerivedQuantity>"
-    
-    const SI_BASE_UNIT = "<http://iso.org/iso-80000/1-v#SIBaseUnit>"
-    const SI_DERIVED_UNIT = "<http://iso.org/iso-80000/1-v#SIDerivedUnit>"
-
-    const IS_BASE_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isBaseUnitFor>"
-    const IS_DERIVED_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isDerivedUnitFor>"
-
-    const HAS_BASE_UNIT_EXPRESSION = "<http://iso.org/iso-80000/1-v#hasBaseUnitExpression>"
-
-    # vim3 ontologies
-
-    const VIM3_VOCABULARY = "<http://bipm.org/jcgm/vim3-v>"
-    const VIM3_DESCRIPTION = "<http://bipm.org/jcgm/vim3-d"
-
     const PLURAL = Dict("quantity" => "quantities", "unit" => "units", "value" => "values")
 
     function parse_commandline()
@@ -192,7 +144,7 @@ module Main
                         ontology_data["prefix"],
                         args["path-base"]
                     ),
-                    add_annotation(ontology_iri, ontology_iri, DC_TITLE, ontology_id),
+                    add_annotation(ontology_iri, ontology_iri, IsqSiLibrary.DC_TITLE, ontology_id),
                     add_annotation(ontology_iri, ontology_iri, RDFS_LABEL, ontology_data["label"]),
                     add_annotation(ontology_iri, ontology_iri, DC_SOURCE, ontology_data["source"])
                 ])
@@ -302,6 +254,7 @@ module Main
 
         @info "$(now()) process units"
         for (unit_id, unit_data) in input["unit_instances"]
+            continue # skip for now
             for description_iri_stem = unit_data["description_iri_stem"]
                 @info "$(now())   $(description_iri_stem) $unit_id"
 

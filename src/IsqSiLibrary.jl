@@ -7,9 +7,72 @@ module IsqSiLibrary
  
     using NamingConventions
 
+    # xsd vocabulary
+
+    const XSD_ANYURI = "<http://www.w3.org/2001/XMLSchema#anyURI>"
+    
+    # dc vocabulary
+
+    export DC_CREATOR, DC_DESCRIPTION, DC_SOURCE, DC_TITLE, DC_IDENTIFIER, DC_TYPE
+    const DC_CREATOR = "<http://purl.org/dc/elements/1.1/creator>"
+    const DC_DESCRIPTION = "<http://purl.org/dc/elements/1.1/description>"
+    const DC_SOURCE = "<http://purl.org/dc/elements/1.1/source>"
+    const DC_TITLE = "<http://purl.org/dc/elements/1.1/title>"
+    const DC_IDENTIFIER = "<http://purl.org/dc/elements/1.1/identifier>"
+    const DC_TYPE = "<http://purl.org/dc/elements/1.1/type>"
+
+    # rdf vocabulary
+
+    export RDF_TYPE
+    const RDF_TYPE = "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"
+
+    # rdfs vocabulary
+
+    export RDFS_LABEL
+    const RDFS_LABEL = "<http://www.w3.org/2000/01/rdf-schema#label>"
+
+    # vim3 vocabulary
+
+    export IS_PROPERTY_OF, HAS_DIMENSION_SYMBOL
+    const IS_PROPERTY_OF = "<http://bipm.org/jcgm/vim3-v#isPropertyOf>"
+    const HAS_DIMENSION_SYMBOL = "<http://bipm.org/jcgm/vim3-v#hasDimensionSymbol>"
+
+    # iso 80000 vocabulary
+
+    export HAS_QUANTITY_IDENTIFIER, HAS_UNIT_IDENTIFIER, HAS_SYMBOL
+    const HAS_QUANTITY_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasQuantityIdentifier>"
+    const HAS_UNIT_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasUnitIdentifier>"
+    const HAS_SYMBOL = "<http://iso.org/iso-80000/1-v#hasSymbol>"
+
+    export ISQ_BASE_QUANTITY, ISQ_DERIVED_QUANTITY
+    const ISQ_BASE_QUANTITY = "<http://iso.org/iso-80000/1-v#ISQBaseQuantity>"
+    const ISQ_DERIVED_QUANTITY = "<http://iso.org/iso-80000/1-v#ISQDerivedQuantity>"
+    
+    export SI_BASE_UNIT, SI_DERIVED_UNIT
+    const SI_BASE_UNIT = "<http://iso.org/iso-80000/1-v#SIBaseUnit>"
+    const SI_DERIVED_UNIT = "<http://iso.org/iso-80000/1-v#SIDerivedUnit>"
+
+    export IS_BASE_UNIT_FOR, IS_DERIVED_UNIT_FOR
+    const IS_BASE_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isBaseUnitFor>"
+    const IS_DERIVED_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isDerivedUnitFor>"
+
+    export HAS_BASE_UNIT_EXPRESSION
+    const HAS_BASE_UNIT_EXPRESSION = "<http://iso.org/iso-80000/1-v#hasBaseUnitExpression>"
+
+    # vim3 ontologies
+
+    export VIM3_VOCABULARY, VIM3_DESCRIPTION
+    const VIM3_VOCABULARY = "<http://bipm.org/jcgm/vim3-v>"
+    const VIM3_DESCRIPTION = "<http://bipm.org/jcgm/vim3-d"
+
+    # description iri stems
+
+    export BIPM_ORG_SI, ISO_ORG_SI
     const BIPM_ORG_SI = "bipm.org/jcgm/si-d"
     const ISO_ORG_SI = "iso.org/si-d"
 
+    # internal constants
+    
     const ONTOLOGY_TYPES = Dict(
         "vocabulary" => "v",
         "description" => "d"
