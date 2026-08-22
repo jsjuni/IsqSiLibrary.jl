@@ -51,7 +51,10 @@ module Main
 
     const HAS_BASE_UNIT_EXPRESSION = "<http://iso.org/iso-80000/1-v#hasBaseUnitExpression>"
 
-    #
+    # vim3 ontologies
+
+    const VIM3_VOCABULARY = "<http://bipm.org/jcgm/vim3-v>"
+    const VIM3_DESCRIPTION = "<http://bipm.org/jcgm/vim3-d"
 
     const PLURAL = Dict("quantity" => "quantities", "unit" => "units", "value" => "values")
 
@@ -216,6 +219,12 @@ module Main
             ])
             if !isnothing(creator)
                 push!(stage_1, add_annotation(bundle_iri, bundle_iri, DC_CREATOR, creator))
+            end
+            if bundle_data["type"] == "vocabulary bundle"
+                push!(stage_2, add_import(bundle_iri, VIM3_VOCABULARY))
+            else
+                push!(stage_2, add_import(bundle_iri, VIM3_VOCABULARY))
+                push!(stage_2, add_import(bundle_iri, VIM3_DESCRIPTION))
             end
             for imprt in bundle_data["imports"]
                 (imprt_iri, unused) = ontology_iri_ns(namespace_base, imprt, args["separator"])
