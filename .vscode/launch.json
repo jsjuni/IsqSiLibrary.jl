@@ -7,6 +7,23 @@
         {
             "type": "julia",
             "request": "launch",
+            "name": "CreateBIMPOML.jl",
+            "program": "${workspaceFolder}/src/CreateBIPMOML.jl",
+            "stopOnEntry": false,
+            "args": [
+                "--creator", "J Steven Jenkins ORCID 0000-0002-0725-0884",
+                "--input", "${workspaceFolder}/build/json/isq-si.json",
+                "--server", "http://127.0.0.1:55411",
+                "--path-base", "${workspaceFolder}/build/oml",
+                "--namespace-base", "http://bipm.org/jcgm",
+                "--si-digital-framework-ns", "<https://si-digital-framework.org/SI/units/>",
+                "--iri-stem", "si",
+                "--defer-diagnostics"//, "--inhibit-updates"
+            ]
+        },
+        {
+            "type": "julia",
+            "request": "launch",
             "name": "CreateISOOML.jl",
             "program": "${workspaceFolder}/src/CreateISOOML.jl",
             "stopOnEntry": false,

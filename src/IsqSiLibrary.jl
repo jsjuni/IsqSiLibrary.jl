@@ -13,13 +13,14 @@ module IsqSiLibrary
     
     # dc vocabulary
 
-    export DC_CREATOR, DC_DESCRIPTION, DC_SOURCE, DC_TITLE, DC_IDENTIFIER, DC_TYPE
+    export DC_CREATOR, DC_DESCRIPTION, DC_SOURCE, DC_TITLE, DC_IDENTIFIER, DC_TYPE, DC_RELATION
     const DC_CREATOR = "<http://purl.org/dc/elements/1.1/creator>"
     const DC_DESCRIPTION = "<http://purl.org/dc/elements/1.1/description>"
     const DC_SOURCE = "<http://purl.org/dc/elements/1.1/source>"
     const DC_TITLE = "<http://purl.org/dc/elements/1.1/title>"
     const DC_IDENTIFIER = "<http://purl.org/dc/elements/1.1/identifier>"
     const DC_TYPE = "<http://purl.org/dc/elements/1.1/type>"
+    const DC_RELATION = "<http://purl.org/dc/elements/1.1/relation"
 
     # rdf vocabulary
 
@@ -48,9 +49,10 @@ module IsqSiLibrary
     const ISQ_BASE_QUANTITY = "<http://iso.org/iso-80000/1-v#ISQBaseQuantity>"
     const ISQ_DERIVED_QUANTITY = "<http://iso.org/iso-80000/1-v#ISQDerivedQuantity>"
     
-    export SI_BASE_UNIT, SI_DERIVED_UNIT
-    const SI_BASE_UNIT = "<http://iso.org/iso-80000/1-v#SIBaseUnit>"
-    const SI_DERIVED_UNIT = "<http://iso.org/iso-80000/1-v#SIDerivedUnit>"
+    export SI_UNIT, SI_BASE_UNIT, SI_DERIVED_UNIT
+    const SI_UNIT = "<http://bipm.org/jcgm/si-v#SIUnit>"
+    const SI_BASE_UNIT = "<http://bipm.org/jcgm/si-v#SIBaseUnit>"
+    const SI_DERIVED_UNIT = "<http://bipm.org/jcgm/si-v#SIDerivedUnit>"
 
     export IS_BASE_UNIT_FOR, IS_DERIVED_UNIT_FOR
     const IS_BASE_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isBaseUnitFor>"
@@ -130,6 +132,14 @@ module IsqSiLibrary
             foldl((s, (dim, unit)) -> replace(s, dim => unit), BASE_UNITS, init = dim_string),
             r"\s+" => "·"
         )
+    end
+
+    export as_anyuri
+    function as_anyuri(string)
+        Dict(
+            "datatypeIri" => XSD_ANYURI,
+            "value" => string
+        )    
     end
 
     export companion_iri_stem
@@ -260,10 +270,8 @@ module IsqSiLibrary
             if !ismissing(ds)
                 document = remove_paren_text(ds)
                 d["document"] = document
-                d["description_iri_stem"] = document == "SI Brochure" ? BIPM_ORG_SI : ISO_ORG_SI
-            else
-                d["description_iri_stem"] = ISO_ORG_SI
-           end
+            end
+            d["description_iri_stem"] = "si-d"
             d["name"] = unit
             d["type"] = unit_data["Type"]
             if d["type"] == "Derived"
