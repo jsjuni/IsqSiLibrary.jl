@@ -62,7 +62,7 @@ In the implementation so far, the unit name is used as a key within the SI syste
 
 That requires adding the list of quantity (kinds) defined by BIPM to the input data, which is not it itself a problem. The problem that arises now is the relation between quantities defined by BIPM and those defined by ISO/IEC.
 
-One straightforward solution may be simply to declare, when appropriate, that an ISO/IEC quantity specializes its corresponding BIPM quantity. This should be straightforward to implement in the current approach because each quantity kind is represented by a class, and archetypal instance of that class, and a rule that states all members of that class are of the same kind as the archetypal instance. This specialization relationship is expressed simply as a subclass relation.
+One straightforward solution may be simply to declare, when appropriate, that an ISO/IEC quantity specializes its corresponding BIPM quantity. This should be straightforward to implement in the current approach because each quantity kind is represented by a class, an archetypal instance of that class, and a rule that states all members of that class are of the same kind as the archetypal instance. This specialization relationship is expressed simply as a subclass relation.
 
 Unfortunately, there does not appear to be a reliable way to map ISO/IEC quantities to BIPM quantites except by inspecting name similarity.
 
