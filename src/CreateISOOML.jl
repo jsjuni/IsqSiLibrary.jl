@@ -288,7 +288,7 @@ module Main
                             namespace_base, vocabulary_iri_stem, separator)
                         unit_class = Dict(
                             "datatypeIri" => XSD_ANYURI,
-                            "value" => vocabulary_iri * quantity_data["unit_class"]
+                            "value" => vocabulary_ns * quantity_data["unit_class"]
                         )
                     
                         @info "$(now())     assert $unit_id type $(quantity_data["unit_class"])"
