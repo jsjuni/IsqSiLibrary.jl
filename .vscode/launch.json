@@ -8,7 +8,7 @@
             "type": "julia",
             "request": "launch",
             "name": "CreateOML.jl",
-            "program": "${workspaceFolder}/src/CreateOML.jl",
+            "program": "${workspaceFolder}/src/julia/CreateOML.jl",
             "stopOnEntry": false,
             "args": [
                 "--creator", "J Steven Jenkins ORCID 0000-0002-0725-0884",
@@ -36,7 +36,17 @@
                 "--output", "${workspaceFolder}/build/json/isq-si.json"
             ]
         },
-        {
+       {
+            "type": "julia",
+            "request": "launch",
+            "name": "ProcessBIPMUnitsSource.jl",
+            "program": "${workspaceFolder}/src/ProcessBIPMUnitsSource.jl",
+            "stopOnEntry": false,
+            "args": [
+                "--units-file", "${workspaceFolder}/build/bipm.org/stage_1/units.json"
+            ]
+        },
+          {
             "type": "julia",
             "request": "launch",
             "name": "Run active Julia file",
