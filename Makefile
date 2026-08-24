@@ -45,7 +45,7 @@ $(STAGE_1_OUTPUT)/quantities.json: $(BIPM_SOURCES)/quantities/quantities.ttl
 .PHONY: stage_2
 
 stage_2: $(STAGE_2_OUTPUT)/units.csv
-#stage_2: $(STAGE_2_OUTPUT)/quantities.csv
+stage_2: $(STAGE_2_OUTPUT)/quantities.csv
 
 $(STAGE_2_OUTPUT):
 	mkdir -p $(STAGE_2_OUTPUT)
@@ -57,6 +57,6 @@ $(STAGE_2_OUTPUT)/units.csv: $(STAGE_1_OUTPUT)/units.json
 	julia --project=. -- src/ProcessBIPMUnitsSource.jl --units-file $< > $@
 
 $(STAGE_2_OUTPUT)/quantities.csv: $(STAGE_1_OUTPUT)/quantities.json
-	julia --project=. src/ProcessBIPMSources.jl $< > $@
+	julia --project=. -- src/ProcessBIPMQuantitiesSource.jl --quantities-file $< > $@
 
 

@@ -46,6 +46,16 @@
                 "--units-file", "${workspaceFolder}/build/bipm.org/stage_1/units.json"
             ]
         },
+       {
+            "type": "julia",
+            "request": "launch",
+            "name": "ProcessBIPMQuantitiesSource.jl",
+            "program": "${workspaceFolder}/src/ProcessBIPMQuantitiesSource.jl",
+            "stopOnEntry": false,
+            "args": [
+                "--quantities-file", "${workspaceFolder}/build/bipm.org/stage_1/quantities.json"
+            ]
+        },
           {
             "type": "julia",
             "request": "launch",
