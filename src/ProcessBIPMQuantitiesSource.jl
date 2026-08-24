@@ -23,11 +23,29 @@ module ProcessBIPMQuantitiesSource
     const HAS_NUMERIC_EXPONENT = "https://si-digital-framework.org/SI#hasNumericExponent"
     const HAS_UNIT_BASE = "https://si-digital-framework.org/SI#hasUnitBase"
 
+    const SUPERSCRIPT_MAP = Dict(
+        "-" => "⁻",
+        "0" => "⁰",
+        "1" => "¹",
+        "2" => "²",
+        "3" => "³",
+        "4" => "⁴",
+        "5" => "⁵",
+        "6" => "⁶",
+        "7" => "⁷",
+        "8" => "⁸",
+        "9" => "⁹"
+    )
+
     function parse_commandline()
         s = ArgParseSettings()
         @add_arg_table s begin
             "--quantities-file"
                 help = "Input file (JSON)"
+                arg_type = String
+                required = true
+            "--units-table"
+                help = "Units table (CSV)"
                 arg_type = String
                 required = true
         end
@@ -87,14 +105,14 @@ module ProcessBIPMQuantitiesSource
         get_boolean(d, PREFIX_RESTRICTION)
     end
 
-    function construct_unit_expression(d, input)
+    function construct_unit_expression(d, input, units)
         if isa(d, JSON.Object)
             if haskey(d, "type")
                 t = d["type"]
                 if t == "uri"
-                    d["value"]
+                    first(units[units.URI .== d["value"], :Symbol])
                 elseif t == "bnode"
-                    construct_unit_expression(input[d["value"]], input)
+                    construct_unit_expression(input[d["value"]], input, units)
                 else
                     error("unknown type")
                 end
@@ -102,15 +120,15 @@ module ProcessBIPMQuantitiesSource
                 tt = first(d[RDF_TYPE])["value"]
                 if tt == UNIT_PRODUCT
                     l = first(d[HAS_LEFT_UNIT_TERM])
-                    lu = construct_unit_expression(l, input)
+                    lu = construct_unit_expression(l, input, units)
                     r = first(d[HAS_RIGHT_UNIT_TERM])
-                    ru = construct_unit_expression(r, input)
+                    ru = construct_unit_expression(r, input, units)
                     "$lu $ru"
                 elseif tt == UNIT_POWER
                     b = first(d[HAS_UNIT_BASE])
-                    bu = construct_unit_expression(b, input)
+                    bu = construct_unit_expression(b, input, units)
                     e = first(d[HAS_NUMERIC_EXPONENT])["value"]
-                    "$bu^$e"
+                    "$bu$e"
                 else
                     error("unknown rdf type")
                 end
@@ -118,13 +136,21 @@ module ProcessBIPMQuantitiesSource
                 error("unknown d type")
             end
         else
-            d
+            error("not json object")
         end
     end
 
-    function get_unit(d, input)
+    function make_superscripts(string)
+        foldl(
+            (s, (k, v)) -> replace(s, k => v),
+            SUPERSCRIPT_MAP,
+            init = string
+        )
+    end
+
+    function get_unit(d, input, units)
         if haskey(d, HAS_UNIT)
-            construct_unit_expression(first(d[HAS_UNIT]), input)
+            make_superscripts(construct_unit_expression(first(d[HAS_UNIT]), input, units))
         else
             missing
         end
@@ -142,6 +168,7 @@ module ProcessBIPMQuantitiesSource
         args = parse_commandline()
 
         quantities_file = args["quantities-file"]
+        units_table = args["units-table"]
 
         #
         # open input file
@@ -156,6 +183,12 @@ module ProcessBIPMQuantitiesSource
 
         @info "$(now()) parse input"
         input = JSON.parse(input)
+
+        #
+        # load units table
+        #
+
+        units = CSV.read(units_table, DataFrame)
 
         #
         # extract quantity definitions
@@ -173,9 +206,9 @@ module ProcessBIPMQuantitiesSource
                 k = first(p)
                 v = last(p)
                 (
-                    Quantity = get_pref_label(v),
+                    QuantityKind = get_pref_label(v),
                     Label = get_alt_label(v),
-                    Unit = get_unit(v, input),
+                    Unit = get_unit(v, input, units),
                     URI = k
                 )
             end,

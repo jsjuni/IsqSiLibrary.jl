@@ -56,7 +56,9 @@ $(STAGE_2_OUTPUT)/quantities.csv: $(STAGE_2_OUTPUT)
 $(STAGE_2_OUTPUT)/units.csv: $(STAGE_1_OUTPUT)/units.json
 	julia --project=. -- src/ProcessBIPMUnitsSource.jl --units-file $< > $@
 
-$(STAGE_2_OUTPUT)/quantities.csv: $(STAGE_1_OUTPUT)/quantities.json
-	julia --project=. -- src/ProcessBIPMQuantitiesSource.jl --quantities-file $< > $@
+$(STAGE_2_OUTPUT)/quantities.csv: $(STAGE_1_OUTPUT)/quantities.json $(STAGE_2_OUTPUT)/units.csv
+	julia --project=. -- src/ProcessBIPMQuantitiesSource.jl \
+		--quantities-file $(STAGE_1_OUTPUT)/quantities.json \
+		--units-table $(STAGE_2_OUTPUT)/units.csv > $@
 
 

@@ -53,7 +53,8 @@
             "program": "${workspaceFolder}/src/ProcessBIPMQuantitiesSource.jl",
             "stopOnEntry": false,
             "args": [
-                "--quantities-file", "${workspaceFolder}/build/bipm.org/stage_1/quantities.json"
+                "--quantities-file", "${workspaceFolder}/build/bipm.org/stage_1/quantities.json",
+                "--units-table", "${workspaceFolder}/build/bipm.org/stage_2/units.csv"
             ]
         },
           {
