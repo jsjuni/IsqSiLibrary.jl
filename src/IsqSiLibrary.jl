@@ -109,21 +109,28 @@ module IsqSiLibrary
     export construct_ontologies
     function construct_ontologies(documents)
 
+        # Document,Latest Edition,Part,Series,Status,Title,Year
+
+        ORG_MAP = Dict("ISO 80000" => "iso.org", "IEC 80000" => "iec.org", "BIPM" => "bipm.org")
+        PATH_MAP = Dict("ISO 80000" => ["iso-80000"], "IEC 80000" => ["iec-80000"], "BIPM" => [])
+        
         ontologies = initialize_dictionary()
         for (document, document_data) in documents
-            m = match(r"^(ISO|IEC) 80000-(\d+)$", document)
-            if !isnothing(m)
-                for (type, suffix) in ONTOLOGY_TYPES
-                    d = initialize_dictionary()
-                    d["label"] = "$document:$(document_data["Year"])"
-                    source = "$document Quantities and units — Part $(document_data["Part"]): $(document_data["Subject Area"])"
-                    d["source"] = source
-                    d["type"] = type
-                    d["iri_stem"] = "$(lowercase(m[1]))-80000/$(m[2])-$suffix"
-                    d["prefix"] = "$(lowercase(m[1]))-80000-$(m[2])-$suffix"
-                    d["companion_iri_stem"] = replace(d["iri_stem"], Regex("-$suffix\$") => "-$(ONTOLOGY_COMPANION[suffix])")
-                    ontologies["$document $type"] = d
-                end
+            series = document_data["Series"]
+            org = if haskey(ORG_MAP, series) ORG_MAP[series] else nothing end
+            if isnothing(org) continue end
+            path = PATH_MAP[series]
+            part = if org == "bipm.org" "si" else document_data["Part"] end
+            for (type, suffix) in ONTOLOGY_TYPES
+                d = initialize_dictionary()
+                d["label"] = "$document:$(document_data["Year"])"
+                d["org"] = org
+                d["source"] = document_data["Title"]
+                d["type"] = type
+                d["iri_stem"] = "$(joinpath(push!(pushfirst!(copy(path), org), string(part))))-$suffix"
+                d["companion_iri_stem"] = replace(d["iri_stem"], Regex("-$suffix\$") => "-$(ONTOLOGY_COMPANION[suffix])")
+                d["prefix"] = join(append!(copy(path), [string(part), suffix]), "-")
+                ontologies[d["prefix"]] = d
             end
         end
         ontologies

@@ -22,17 +22,19 @@
         {
             "type": "julia",
             "request": "launch",
-            "name": "ProcessSources.jl",
-            "program": "${workspaceFolder}/src/ProcessSources.jl",
+            "name": "ProcessNotionSources.jl",
+            "program": "${workspaceFolder}/src/ProcessNotionSources.jl",
             "stopOnEntry": false,
             "args": [
-                "--sources-path-prefix", "${workspaceFolder}/resource/ISQ & SI Reference",
-                "--dimensions-source", "SI Base Dimensions a72ac099666843ed86e0c23c45c5304a.csv",
-                "--documents-source", "Defining Documents ff3fbbe356d348cfb81f1038b92ce8fe.csv",
-                "--quantities-source", "ISQ Quantities e1b3e75b0f85444aa01339cbc9e867df.csv",
-                "--units-source", "SI Units b419c70b1bf040e3b87a04a900378d01.csv",
-                "--prefixes-source", "SI Prefixes 00b23fe2521d407688f118fd44e4e1f1.csv",
-                "--symbols-source", "Quantity Symbols 3c0b24cf917a807a8b41fd799eb11f3b.csv",
+                "--sources-path-prefix", "${workspaceFolder}/build/stage_3",
+                "--defining-documents", "Defining Documents ff3fbbe356d348cfb81f1038b92ce8fe.csv",
+                "--isq-alternate-quantity-names", "ISQ Alternate Quantity Names 3bfb24cf917a807b894aef90b1c6b03d.csv",
+                "--isq-quantities", "ISQ Quantities e1b3e75b0f85444aa01339cbc9e867df.csv",
+                "--isq-quantity-symbols", "ISQ Quantity Symbols 3c0b24cf917a807a8b41fd799eb11f3b.csv",
+                "--isq-units", "ISQ Units b419c70b1bf040e3b87a04a900378d01.csv",
+                "--si-prefixes", "SI Prefixes 00b23fe2521d407688f118fd44e4e1f1.csv",
+                "--si-quantities", "SI Quantities 32cde0fb98d64a7eb326541295d6828a.csv",
+                "--si-units", "SI Units 998717c59d0a4afb812373ff5eed110b.csv",
                 "--output", "${workspaceFolder}/build/json/isq-si.json"
             ]
         },
