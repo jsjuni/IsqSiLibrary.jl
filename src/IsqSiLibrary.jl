@@ -213,6 +213,16 @@ module IsqSiLibrary
         bundles
     end
 
+    export construct_si_entities
+    function construct_si_entities(ontologies, si_quantities_df, si_units_df)
+        entities = initialize_dictionary()
+    end
+
+    export construct_isq_entities
+    function construct_isq_entities(ontologies, si_quantities_df, si_units_df, isq_quantities_df, isq_units_df)
+        entities = initialize_dictionary()
+    end
+
     export construct_quantity_instances
     function construct_quantity_instances(quantities, ontologies, symbols)
         quantity_instances = initialize_dictionary()

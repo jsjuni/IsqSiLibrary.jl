@@ -35,7 +35,7 @@ module Main
                 arg_type = String
                 required = true
             "--isq-alternate-quantity-names"
-                help = "ISQ altnerate quantity names source (CSV)"
+                help = "ISQ alternate quantity names source (CSV)"
                 arg_type = String
                 required = true
             "--isq-quantities"
@@ -95,15 +95,17 @@ module Main
         @info "$(now()) loading ontology bundles source $(args["ontology-bundles"])"
         ontology_bundles_df = load_csv_document(args["sources-path-prefix"], args["ontology-bundles"])
 
-        #
-        # build dictionaries of input data
-        #
+        @info "$(now()) loading si quantities source $(args["si-quantities"])"
+        si_quantities_df = load_csv_document(args["sources-path-prefix"], args["si-quantities"])
 
-        # @info "$(now()) building defining documents dictionary"
-        # defining_documents = table_to_dict(defining_documents_csv, "Document")
- 
-        # @info "$(now()) building ontology bundles dictionary"
-        # ontology_bundles = table_to_dict(ontology_bundles_csv, "Bundle")
+        @info "$(now()) loading si units source $(args["si-units"])"
+        si_units_df = load_csv_document(args["sources-path-prefix"], args["si-units"])
+
+        @info "$(now()) loading isq quantities source $(args["isq-quantities"])"
+        isq_quantities_df = load_csv_document(args["sources-path-prefix"], args["isq-quantities"])
+
+        @info "$(now()) loading si units source $(args["isq-units"])"
+        isq_units_df = load_csv_document(args["sources-path-prefix"], args["isq-units"])
 
         #
         # create authorities
@@ -126,28 +128,26 @@ module Main
         knowledge["bundles"] = bundles
 
         #
-        # create quantity instances
+        # create si entities
         #
 
-        @info "$(now()) create quantity instances"
-        quantity_instances = Dict()
-        # quantity_instances = construct_quantity_instances(quantities, ontologies, symbols)
-        # knowledge["quantity_instances"] = quantity_instances
+        @info "$(now()) create si entities"
+        si_entities = construct_si_entities(ontologies, si_quantities_df, si_units_df)
+        knowledge["si_entities"] = si_entities
 
         #
-        # create unit instances
+        # create si entities
         #
 
-        @info "$(now()) create unit instances"
-        unit_instances = Dict()
-        # unit_instances = construct_unit_instances(units, quantities, ontologies, quantity_instances)
-        # knowledge["unit_instances"] = unit_instances
+        @info "$(now()) create isq entities"
+        isq_entities = construct_isq_entities(ontologies, si_quantities_df, si_units_df, isq_quantities_df, isq_units_df)
+        knowledge["isq_entities"] = isq_entities
 
         #
         # write output
         #
 
-        @info "$(now()) saving $(length(quantity_instances)) quantities, $(length(unit_instances)) units"
+        @info "$(now()) saving $(length(si_entities)) si entities, $(length(isq_entities)) isq entities"
         output = (args["output"] == "" ? stdout : open(args["output"], "w"))
         JSON.json(output, knowledge, pretty = true)
         
