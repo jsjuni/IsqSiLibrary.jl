@@ -18,13 +18,13 @@ module IsqSiLibrary
     )
 
     const BUNDLE_TYPES = Dict(
-        "vocabulary bundle" => "vb",
-        "description bundle" => "db"
+        "vocabulary" => "vb",
+        "description" => "db"
     )
     
     const BUNDLE_IMPORTS = Dict(
-        "vocabulary bundle" => ["vocabulary"],
-        "description bundle" => ["vocabulary bundle", "description"]
+        "vocabulary" => [],
+        "description" => ["vocabulary"]
     )
 
     const BASE_UNITS = Dict(
@@ -57,6 +57,14 @@ module IsqSiLibrary
 
     function extract_paren_text(string)
         match(r"\(([^)]*)\)", string)[1]
+    end
+
+    function get_keys(string)
+        if ismissing(string) || isnothing(string)
+            []
+        else
+            map(remove_paren_text, split(string, r"\s*,\s*"))
+        end
     end
 
     function base_expression(dim_string)
@@ -106,56 +114,102 @@ module IsqSiLibrary
         dimensions
     end
 
+    export construct_authorities
+    function construct_authorities(authorities_df)
+        authorities = initialize_dictionary()
+        for row in eachrow(authorities_df)
+            authorities[row["Authority"]] = Dict(
+                "iri_path" => row["IRI Path"]
+            )
+        end
+        authorities
+    end
+
     export construct_ontologies
-    function construct_ontologies(documents)
+    function construct_ontologies(authorities, documents_df)
 
-        # Document,Latest Edition,Part,Series,Status,Title,Year
-
-        ORG_MAP = Dict("ISO 80000" => "iso.org", "IEC 80000" => "iec.org", "BIPM" => "bipm.org")
-        PATH_MAP = Dict("ISO 80000" => ["iso-80000"], "IEC 80000" => ["iec-80000"], "BIPM" => [])
-        
         ontologies = initialize_dictionary()
-        for (document, document_data) in documents
-            series = document_data["Series"]
-            org = if haskey(ORG_MAP, series) ORG_MAP[series] else nothing end
-            if isnothing(org) continue end
-            path = PATH_MAP[series]
-            part = if org == "bipm.org" "si" else document_data["Part"] end
+
+        for row in eachrow(documents_df)
+            document_id = row["Document"]
+            authority = remove_paren_text(row["Authority"])
+            authority_path = authorities[authority]["iri_path"]
+            document_path = ismissing(row["IRI Path"]) ? "" : row["IRI Path"]
+            document_stem = string(row["IRI Stem"])
             for (type, suffix) in ONTOLOGY_TYPES
-                d = initialize_dictionary()
-                d["label"] = "$document:$(document_data["Year"])"
-                d["org"] = org
-                d["source"] = document_data["Title"]
-                d["type"] = type
-                d["iri_stem"] = "$(joinpath(push!(pushfirst!(copy(path), org), string(part))))-$suffix"
-                d["companion_iri_stem"] = replace(d["iri_stem"], Regex("-$suffix\$") => "-$(ONTOLOGY_COMPANION[suffix])")
-                d["prefix"] = join(append!(copy(path), [string(part), suffix]), "-")
-                ontologies[d["prefix"]] = d
+                prefix = replace("$document_path-$document_stem-$suffix", r"^-" => "")
+                companion_prefix = "$document_path-$document_stem-$(ONTOLOGY_COMPANION[suffix])"
+                iri_path = joinpath(authority_path, document_path, document_stem)
+                d = OrderedDict(
+                    "id" => document_id,
+                    "label" => "$document_id:$(row["Year"])",
+                    "title" => row["Title"],
+                    "type" => type,
+                    "iri_path" => "$iri_path-$suffix",
+                    "prefix" => prefix,
+                    "companion_prefix" => companion_prefix,
+                    "curated" => row["Curated Ontology"] == "Yes"
+                )
+                ontologies[prefix] = d
             end
         end
+
         ontologies
     end
 
     export construct_bundles
-    function construct_bundles(ontologies, stem = "iso-80000", title_stem = "ISO 80000")
+    function construct_bundles(authorities, ontologies, bundles_df)
 
         bundles = initialize_dictionary()
-        for (type, suffix) in BUNDLE_TYPES
-            d = initialize_dictionary()
-            d["type"] = type
-            d["iri_stem"] = "$stem/$suffix"
-            d["prefix"] = "$stem-$suffix"
-            bundles["$title_stem $type"] = d
-        end
-        for (bundle_data) in values(bundles)
-            imports = []
-            imports_type_list = BUNDLE_IMPORTS[bundle_data["type"]]
-            for import_type in imports_type_list
-                candidates = collect(Iterators.flatmap(h -> values(h), [bundles, ontologies]))
-                append!(imports, map(oh -> oh["iri_stem"], filter(oh -> oh["type"] == import_type, candidates)))
+
+        for row in eachrow(bundles_df)
+            bundle_id = row["Bundle"]
+            bundle_path = row["IRI Path"]
+            imports_ontology = get_keys(row["Imports Ontology"])
+            for (type, suffix) in BUNDLE_TYPES
+                prefix = "$bundle_path-$suffix"
+                d = OrderedDict(
+                    "bundle" => bundle_id,
+                    "type" => type,
+                    "prefix" => prefix,
+                    "iri_path" => joinpath(bundle_path, suffix),
+                    "imports" => map(
+                        o -> o["iri_path"],
+                        filter(
+                            o -> o["id"] in imports_ontology && o["type"] == type,
+                            collect(values(ontologies))
+                        )
+                    )
+                )
+                if type == "description"
+                    push!(d["imports"], replace(prefix, r"-db$" => "-vb"))
+                end
+                bundles[prefix] = d
             end
-            bundle_data["imports"] = imports
+
         end
+
+        for row in eachrow(bundles_df)
+            imports_bundle = get_keys(row["Imports Bundle"])
+            for (type, suffix) in BUNDLE_TYPES
+                importing_prefix = first(map(
+                    ib -> ib["prefix"],
+                    filter(
+                        bundle -> bundle["bundle"] == row["Bundle"] && bundle["type"] == type,
+                        collect(values(bundles))
+                    )
+                ))
+                imported_iri_paths = map(
+                    ib -> ib["iri_path"],
+                    filter(
+                        bundle -> bundle["bundle"] in imports_bundle && bundle["type"] == type,
+                        collect(values(bundles))
+                    )
+                )
+                append!(bundles[importing_prefix]["imports"], imported_iri_paths)
+            end
+        end
+
         bundles
     end
 

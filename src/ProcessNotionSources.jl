@@ -22,8 +22,16 @@ module Main
                 help = "path prefix to sources"
                 arg_type = String
                 required = true
+            "--authorities"
+                help = "authorities source (CSV)"
+                arg_type = String
+                required = true
             "--defining-documents"
                 help = "defining documents source (CSV)"
+                arg_type = String
+                required = true
+            "--ontology-bundles"
+                help = "ontology bundles source (CSV)"
                 arg_type = String
                 required = true
             "--isq-alternate-quantity-names"
@@ -78,27 +86,44 @@ module Main
         # parse input data sources
         #
 
-        @info "$(now()) loading documents source $(args["defining-documents"])"
-        defining_documents_csv = load_csv_document(args["sources-path-prefix"], args["defining-documents"])
+        @info "$(now()) loading authorities source $(args["authorities"])"
+        authorities_df = load_csv_document(args["sources-path-prefix"], args["authorities"])
 
-       #
+        @info "$(now()) loading documents source $(args["defining-documents"])"
+        defining_documents_df = load_csv_document(args["sources-path-prefix"], args["defining-documents"])
+
+        @info "$(now()) loading ontology bundles source $(args["ontology-bundles"])"
+        ontology_bundles_df = load_csv_document(args["sources-path-prefix"], args["ontology-bundles"])
+
+        #
         # build dictionaries of input data
         #
 
-        @info "$(now()) building defining documents dictionary"
-        defining_documents = table_to_dict(defining_documents_csv, "Document")
+        # @info "$(now()) building defining documents dictionary"
+        # defining_documents = table_to_dict(defining_documents_csv, "Document")
  
+        # @info "$(now()) building ontology bundles dictionary"
+        # ontology_bundles = table_to_dict(ontology_bundles_csv, "Bundle")
+
+        #
+        # create authorities
+        #
+
+        @info "$(now()) create authorities"
+        authorities = construct_authorities(authorities_df)
+        knowledge["authorities"] = authorities
+
         #
         # create ontologies and bundles
         #
 
         @info "$(now()) create ontologies"
-        ontologies = construct_ontologies(defining_documents)
+        ontologies = construct_ontologies(authorities, defining_documents_df)
         knowledge["ontologies"] = ontologies
 
         @info "$(now()) create bundles"
-        # bundles = construct_bundles(ontologies)
-        # knowledge["bundles"] = bundles
+        bundles = construct_bundles(authorities, ontologies, ontology_bundles_df)
+        knowledge["bundles"] = bundles
 
         #
         # create quantity instances
