@@ -128,15 +128,19 @@ module Main
         knowledge["bundles"] = bundles
 
         #
-        # create si entities
+        # create si quantities
         #
 
-        @info "$(now()) create si entities"
-        si_entities = construct_si_entities(ontologies, si_quantities_df, si_units_df)
-        knowledge["si_entities"] = si_entities
+        @info "$(now()) create si quantities"
+        si_quantities = construct_si_quantities(ontologies, si_quantities_df, si_units_df)
+        knowledge["si_quantities"] = si_quantities
+
+        @info "$(now()) create si units"
+        si_units = construct_si_units(ontologies, si_quantities, si_units_df)
+        knowledge["si_units"] = si_units
 
         #
-        # create si entities
+        # create isq entities
         #
 
         @info "$(now()) create isq entities"
@@ -147,7 +151,10 @@ module Main
         # write output
         #
 
-        @info "$(now()) saving $(length(si_entities)) si entities, $(length(isq_entities)) isq entities"
+        @info "$(now()) saving $(length(si_quantities)) si quantities"
+        @info "$(now()) saving $(length(si_units)) si units"
+        # @info "$(now()) saving $(length(isq_quantities)) isq quantities"
+        # @info "$(now()) saving $(length(isq_units)) isq units"
         output = (args["output"] == "" ? stdout : open(args["output"], "w"))
         JSON.json(output, knowledge, pretty = true)
         

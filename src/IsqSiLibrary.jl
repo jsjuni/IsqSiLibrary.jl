@@ -37,6 +37,20 @@ module IsqSiLibrary
         "J" => "cd"
     )
 
+    const QUANTITY_CLASSES = OrderedDict(
+        "quantity" => "",
+        "unit" => "unit",
+        "value" => "value"
+    )
+
+    const SI_UNIT_TYPES = Dict{Union{Missing, Nothing, String},Union{Nothing, String}}(
+        "SI base unit" => "base",
+        "Named SI derived unit" => "named",
+        "Non-SI unit accepted for use with the SI" => "non-si",
+        missing => nothing,
+        nothing => nothing
+    )
+
     struct SpaceCase <: AbstractNamingConvention end
 
     function NamingConventions.encode(::Type{SpaceCase}, v::AbstractString)
@@ -51,19 +65,15 @@ module IsqSiLibrary
         NamingConventions.convert(SpaceCase, SnakeCase, string)
     end
 
-    function remove_paren_text(string)
-        replace(string, r" \(.*" => "")
-    end
-
-    function extract_paren_text(string)
-        match(r"\(([^)]*)\)", string)[1]
+    function remove_md_link(string)
+        replace(string, r" \(\S+\.md\)$" => "")
     end
 
     function get_keys(string)
         if ismissing(string) || isnothing(string)
             []
         else
-            map(remove_paren_text, split(string, r"\s*,\s*"))
+            map(remove_md_link, split(string, r"\s*,\s*"))
         end
     end
 
@@ -74,7 +84,6 @@ module IsqSiLibrary
         )
     end
 
-    export companion_iri_stem
     function companion_iri_stem(stem, ontologies)
         for ontology in values(ontologies)
             if stem == ontology["iri_stem"]
@@ -82,6 +91,16 @@ module IsqSiLibrary
             end
         end
         return nothing
+    end
+
+    function get_ontologies(document_id, ontologies)
+        map(
+            type -> first(filter(
+                o -> o["id"] == document_id && o["type"] == type,
+                collect(values(ontologies))
+            ))
+        , ["vocabulary", "description"]
+        )
     end
 
     export parse_csv_source
@@ -132,7 +151,7 @@ module IsqSiLibrary
 
         for row in eachrow(documents_df)
             document_id = row["Document"]
-            authority = remove_paren_text(row["Authority"])
+            authority = remove_md_link(row["Authority"])
             authority_path = authorities[authority]["iri_path"]
             document_path = ismissing(row["IRI Path"]) ? "" : row["IRI Path"]
             document_stem = string(row["IRI Stem"])
@@ -213,9 +232,108 @@ module IsqSiLibrary
         bundles
     end
 
-    export construct_si_entities
-    function construct_si_entities(ontologies, si_quantities_df, si_units_df)
-        entities = initialize_dictionary()
+    export construct_si_quantities
+    function construct_si_quantities(ontologies, si_quantities_df, si_units_df)
+        quantities = initialize_dictionary()
+
+        for row in eachrow(si_quantities_df)
+
+            # quantities for named units only
+
+            if row["Anonymous Unit"] == "Yes"
+                continue
+            end
+
+            # quantity type (base, derived, etc.) follows from highest unit type
+            # omit Units by Symbol
+            # we may not need this
+
+            units = collect(unique(mapfoldl(c -> get_keys(row[c]), append!, ["Units By URI"])))
+            if isempty(units)
+                continue
+            end
+            unit_types = map(u -> SI_UNIT_TYPES[u], si_units_df[in.(si_units_df.Unit, [units]), :Type])
+            type = if any(unit_types .== "base")
+                "base"
+            elseif any(unit_types .== "named")
+                "named"
+            elseif any(unit_types .== "non-si")
+                "non-si"
+            else
+                nothing
+            end
+
+            # look up vocabulary and description info dicts
+
+            document_id = remove_md_link(row["Defining Documents"])
+            (vocabulary, description) = get_ontologies(document_id, ontologies)
+
+            # set quantity properties and create quantity dict
+
+            label = row["Quantity"]
+            name = NamingConventions.convert(SpaceCase, SnakeCase, label)
+            iri = "$(vocabulary["iri_path"])#$name"
+            classes = OrderedDict()
+            for (k, v) in QUANTITY_CLASSES
+                classes[k] = NamingConventions.convert(SpaceCase, PascalCase, strip("$label $v"))
+            end
+            d = OrderedDict(
+                "label" => label,
+                "si_label" => row["Label"],
+                "name" => name,
+                "iri" => iri,
+                "vocabulary_iri_path" => vocabulary["iri_path"],
+                "description_iri_path" => description["iri_path"],
+                "classes" => classes,
+                "type" => type
+            )
+
+            # save quantity dict
+
+            quantities[iri] = d
+        end
+
+        quantities
+    end
+
+    export construct_si_units
+    function construct_si_units(ontologies, si_quantities, si_units_df)
+        units = initialize_dictionary()
+
+        for row in eachrow(si_units_df)
+
+            quantity_label = remove_md_link(row["QuantityKindsByURI"])
+            quantity_dict = first(filter(
+                qd -> qd["label"] == quantity_label,
+                collect(values(si_quantities))
+            ))
+            quantity_class = quantity_dict["classes"]["quantity"]
+ 
+            document_id = remove_md_link(row["Defining Documents"])
+            (vocabulary, description) = get_ontologies(document_id, ontologies)
+
+            # set unit properties and create unit dict
+
+            label = row["Unit"]
+            name = NamingConventions.convert(SpaceCase, SnakeCase, label)
+            symbol = row["Symbol"]
+            iri = "$(vocabulary["iri_path"])#$name"
+            type = SI_UNIT_TYPES[row["Type"]]
+            d = OrderedDict(
+                "label" => label,
+                "name" => name,
+                "symmbol" => symbol,
+                "iri" => iri,
+                "vocabulary_iri_path" => vocabulary["iri_path"],
+                "description_iri_path" => description["iri_path"],
+                "type" => type,
+                "class" => quantity_class
+            )
+
+            units[iri] = d
+        end
+
+        units
     end
 
     export construct_isq_entities
@@ -230,8 +348,8 @@ module IsqSiLibrary
             d = initialize_dictionary()
             d["name"] = quantity
             alternate_names = quantity_data["Alternate Names"]
-            d["alternate_names"] = ismissing(alternate_names) ? [] : map(remove_paren_text, split(alternate_names, r"\s*,\s*"))
-            document = remove_paren_text(quantity_data["Defining Document"])
+            d["alternate_names"] = ismissing(alternate_names) ? [] : map(remove_md_link, split(alternate_names, r"\s*,\s*"))
+            document = remove_md_link(quantity_data["Defining Document"])
             ontology_key = "$document description"
             ontology_data = ontologies[ontology_key]
             d["description_iri_stem"] = ontology_data["iri_stem"]
@@ -240,7 +358,7 @@ module IsqSiLibrary
             d["item"] = quantity_data["Item"]
             d["description"] = quantity_data["Description"]
             symbol_field = quantity_data["Symbol"]
-            symbol_keys = ismissing(symbol_field) ? [] : map(remove_paren_text, split(symbol_field, r"\s*,\s*"))
+            symbol_keys = ismissing(symbol_field) ? [] : map(remove_md_link, split(symbol_field, r"\s*,\s*"))
             d["symbols"] = map(k -> symbols[k]["LaTeX"], symbol_keys)
             d["dimension_symbol"] = "[to be constructed]"
             name = instance_name(quantity)
@@ -269,7 +387,7 @@ module IsqSiLibrary
             d["symbol"] = unit_data["Symbol"]
             quantity_string = unit_data["ISQ Quantities"]
             if !ismissing(quantity_string)
-                qs = map(remove_paren_text, split(quantity_string, r"\s*,\s*"))
+                qs = map(remove_md_link, split(quantity_string, r"\s*,\s*"))
                 d["quantity"] = map(
                     function(q)
                         NamingConventions.convert(SpaceCase, SnakeCase, q)
