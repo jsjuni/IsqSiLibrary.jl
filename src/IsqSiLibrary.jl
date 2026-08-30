@@ -245,10 +245,8 @@ module IsqSiLibrary
             end
 
             # quantity type (base, derived, etc.) follows from highest unit type
-            # omit Units by Symbol
-            # we may not need this
 
-            units = collect(unique(mapfoldl(c -> get_keys(row[c]), append!, ["Units By URI"])))
+            units = collect(unique(mapfoldl(c -> get_keys(row[c]), append!, ["Units By Symbol", "Units By URI"])))
             if isempty(units)
                 continue
             end
