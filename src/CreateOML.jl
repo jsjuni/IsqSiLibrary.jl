@@ -1,4 +1,4 @@
-module Main
+module CreateOML
 
     using ArgParse
     using Logging
@@ -136,6 +136,7 @@ module Main
         Base.Unicode.uppercasefirst(string)
     end
 
+    export main
     function(@main)(ARGS)
 
         @info "$(now()) start"
@@ -179,25 +180,29 @@ module Main
 
         @info "$(now()) create ontologies"
         for (ontology_id, ontology_data) in input["ontologies"]
-            filename = joinpath(path_base, namespace_path, ontology_data["iri_stem"]) * ".oml"
-            if isfile(filename)
-                @info "$(now())   skip $ontology_id: file exists"
+             if ontology_data["curated"]
+                @info "$(now())   skip curated ontology $ontology_id"
             else
-                (ontology_iri, ontology_namespace) = ontology_iri_ns(namespace_base, ontology_data["iri_stem"], args["separator"])
-                @info "$(now())   create $ontology_id $ontology_namespace"
+                iri = ontology_data["iri_path"]
+                ns = iri * separator
+                label = ontology_data["label"]
+                source = "$label $(ontology_data["title"])"
+                @info "$(now())   delete $ontology_id"
+                update(server, [delete_ontology(iri)], false)
+                @info "$(now())   create $ontology_id"
                 append!(stage_1, [
                     create_ontology(
                         ontology_data["type"],
-                        ontology_namespace,
+                        ns,
                         ontology_data["prefix"],
                         args["path-base"]
                     ),
-                    add_annotation(ontology_iri, ontology_iri, DC_TITLE, ontology_id),
-                    add_annotation(ontology_iri, ontology_iri, RDFS_LABEL, ontology_data["label"]),
-                    add_annotation(ontology_iri, ontology_iri, DC_SOURCE, ontology_data["source"])
+                    add_annotation(iri, iri, DC_TITLE, ontology_id),
+                    add_annotation(iri, iri, RDFS_LABEL, label),
+                    add_annotation(iri, iri, DC_SOURCE, source)
                 ])
                 if !isnothing(creator)
-                    push!(stage_1, add_annotation(ontology_iri, ontology_iri, DC_CREATOR, creator))
+                    push!(stage_1, add_annotation(iri, iri, DC_CREATOR, creator))
                 end
             end
         end
@@ -205,7 +210,7 @@ module Main
         # create bundles
 
         @info "$(now()) create bundles"
-        for (bundle_id, bundle_data) in input["bundles"]
+#=         for (bundle_id, bundle_data) in input["bundles"]
             (bundle_iri, bundle_namespace) = ontology_iri_ns(namespace_base, bundle_data["iri_stem"], args["separator"])
             @info "$(now())   create $bundle_id $bundle_namespace"
             append!(stage_1, [
@@ -231,12 +236,12 @@ module Main
                 @info "$(now())     add import for $imprt"
                 push!(stage_2, add_import(bundle_iri, imprt_iri))
             end
-        end
+        end =#
 
         # process quantities
 
         @info "$(now()) process quantities"
-        for (quantity_id, quantity_data) in input["quantity_instances"]
+#=         for (quantity_id, quantity_data) in input["quantity_instances"]
             @info "$(now())   $(quantity_data["description_iri_stem"]) $quantity_id"
 
             # create quantity instance
@@ -296,12 +301,12 @@ module Main
             append!(stage_1, [
             ])
 
-       end
+       end =#
 
         # process units
 
         @info "$(now()) process units"
-        for (unit_id, unit_data) in input["unit_instances"]
+#=         for (unit_id, unit_data) in input["unit_instances"]
             for description_iri_stem = unit_data["description_iri_stem"]
                 @info "$(now())   $(description_iri_stem) $unit_id"
 
@@ -353,7 +358,7 @@ module Main
                     )
                 end
             end
-        end
+        end =#
 
         # update server
 
@@ -374,3 +379,4 @@ module Main
     end
 
 end
+using .CreateOML
