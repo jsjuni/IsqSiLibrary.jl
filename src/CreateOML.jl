@@ -168,29 +168,35 @@ module CreateOML
 
         input = JSON.parse(input_file)
 
-        stage_1 = []
-        stage_2 = []
+        stage_1 = [] # bundle deletion
+        stage_2 = [] # ontology deletion
+        stage_3 = [] # ontology and bundle creation, population
+        stage_4 = [] # bundle imports
 
         operations = OrderedDict(
             "stage 1" => stage_1,
-            "stage 2" => stage_2
+            "stage 2" => stage_2,
+            "stage 3" => stage_3,
+            "stage 4" => stage_4
         )
 
         # create ontologies
 
         @info "$(now()) create ontologies"
         for (ontology_id, ontology_data) in input["ontologies"]
-             if ontology_data["curated"]
+            if ontology_data["curated"]
                 @info "$(now())   skip curated ontology $ontology_id"
             else
-                iri = ontology_data["iri_path"]
-                ns = iri * separator
+                @info "$(now())   $ontology_id"
+                (iri, ns) = ontology_iri_ns(namespace_base, ontology_data["iri_path"], separator)
                 label = ontology_data["label"]
                 source = "$label $(ontology_data["title"])"
-                @info "$(now())   delete $ontology_id"
-                update(server, [delete_ontology(iri)], false)
-                @info "$(now())   create $ontology_id"
-                append!(stage_1, [
+                @info "$(now())     delete"
+                if !args["inhibit-updates"]
+                    push!(stage_2, delete_ontology(iri))
+                end
+                @info "$(now())     create"
+                append!(stage_3, [
                     create_ontology(
                         ontology_data["type"],
                         ns,
@@ -202,7 +208,7 @@ module CreateOML
                     add_annotation(iri, iri, DC_SOURCE, source)
                 ])
                 if !isnothing(creator)
-                    push!(stage_1, add_annotation(iri, iri, DC_CREATOR, creator))
+                    push!(stage_3, add_annotation(iri, iri, DC_CREATOR, creator))
                 end
             end
         end
@@ -210,33 +216,33 @@ module CreateOML
         # create bundles
 
         @info "$(now()) create bundles"
-#=         for (bundle_id, bundle_data) in input["bundles"]
-            (bundle_iri, bundle_namespace) = ontology_iri_ns(namespace_base, bundle_data["iri_stem"], args["separator"])
-            @info "$(now())   create $bundle_id $bundle_namespace"
-            append!(stage_1, [
+        for (bundle_id, bundle_data) in input["bundles"]
+            @info "$(now())   $bundle_id"
+            (iri, ns) = ontology_iri_ns(namespace_base, bundle_data["iri_path"], separator)
+            type = "$(bundle_data["type"]) bundle"
+            @info "$(now())     delete"
+            if !args["inhibit-updates"]
+                push!(stage_1, delete_ontology(iri))
+            end
+            @info "$(now())     create"
+            append!(stage_3, [
                 create_ontology(
-                    bundle_data["type"],
-                    bundle_namespace,
+                    type,
+                    ns,
                     bundle_data["prefix"],
                     args["path-base"]
                 ),
-                add_annotation(bundle_iri, bundle_iri, DC_TITLE, bundle_id)
+                add_annotation(iri, iri, DC_TITLE, bundle_id)
             ])
             if !isnothing(creator)
-                push!(stage_1, add_annotation(bundle_iri, bundle_iri, DC_CREATOR, creator))
+                push!(stage_3, add_annotation(iri, iri, DC_CREATOR, creator))
             end
-            if bundle_data["type"] == "vocabulary bundle"
-                push!(stage_2, add_import(bundle_iri, VIM3_VOCABULARY))
-            else
-                push!(stage_2, add_import(bundle_iri, VIM3_VOCABULARY))
-                push!(stage_2, add_import(bundle_iri, VIM3_DESCRIPTION))
+            for imported in bundle_data["imports"]
+                imported_iri = first(ontology_iri_ns(namespace_base, imported, separator))
+                @info "$(now())     imports $imported_iri"
+                push!(stage_4, add_import(iri, imported_iri))
             end
-            for imprt in bundle_data["imports"]
-                (imprt_iri, unused) = ontology_iri_ns(namespace_base, imprt, args["separator"])
-                @info "$(now())     add import for $imprt"
-                push!(stage_2, add_import(bundle_iri, imprt_iri))
-            end
-        end =#
+        end
 
         # process quantities
 
