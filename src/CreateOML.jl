@@ -35,11 +35,18 @@ module CreateOML
     const IS_PROPERTY_OF = "<http://bipm.org/vim-v#isPropertyOf>"
     const HAS_DIMENSION_SYMBOL = "<http://bipm.org/vim-v#hasDimensionSymbol>"
 
-    const SI_QUANTITY = "<http://bipm.org/vim-v#SIQuantity>"
-    const SI_BASE_QUANTITY = "<http://bipm.org/vim-v#SIBaseQuantity>"
-    const SI_NAMED_QUANTITY = "<http://bipm.org/vim-v#SINamedQuantity>"
-    const SI_NON_SI_QUANTITY = "<http://bipm.org/vim-v#SINonSIQuantity>"
+    const SI_QUANTITY = "<http://bipm.org/si-prov-v#SIQuantity>"
+    const SI_BASE_QUANTITY = "<http://bipm.org/si-prov-v#SIBaseQuantity>"
+    const SI_NAMED_QUANTITY = "<http://bipm.org/si-prov-v#SINamedQuantity>"
+    const SI_NON_SI_QUANTITY = "<http://bipm.org/si-prov-v#SINonSIQuantity>"
  
+    const SI_UNIT = "<http://bipm.org/si-prov-v#SIUnit>"
+    const SI_BASE_UNIT = "<http://bipm.org/si-prov-v#SIBaseUnit>"
+    const SI_NAMED_UNIT = "<http://bipm.org/si-prov-v#SINamedUnit>"
+    const SI_NON_SI_UNIT = "<http://bipm.org/si-prov-v#SINonSIUnit>"
+
+    const HAS_UNIT_SYMBOL = "<http://bipm.org/si-prov-v#hasUnitSymbol>"
+
     # iso 80000 vocabulary
 
     const HAS_QUANTITY_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasQuantityIdentifier>"
@@ -49,9 +56,6 @@ module CreateOML
     const ISQ_BASE_QUANTITY = "<http://iso.org/iso-80000/1-v#ISQBaseQuantity>"
     const ISQ_DERIVED_QUANTITY = "<http://iso.org/iso-80000/1-v#ISQDerivedQuantity>"
     
-    const SI_BASE_UNIT = "<http://iso.org/iso-80000/1-v#SIBaseUnit>"
-    const SI_DERIVED_UNIT = "<http://iso.org/iso-80000/1-v#SIDerivedUnit>"
-
     const IS_BASE_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isBaseUnitFor>"
     const IS_DERIVED_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isDerivedUnitFor>"
 
@@ -70,6 +74,14 @@ module CreateOML
         "non-si" => SI_NON_SI_QUANTITY,
         missing => SI_QUANTITY,
         nothing => SI_QUANTITY
+    )
+
+    const SI_UNIT_CLASS = Dict(
+        "base" => SI_BASE_UNIT,
+        "named" => SI_NAMED_UNIT,
+        "non-si" => SI_NON_SI_UNIT,
+        missing => SI_UNIT,
+        nothing => SI_UNIT
     )
 
     function parse_commandline()
@@ -105,6 +117,10 @@ module CreateOML
                 help = "Value of dc:creator annotation on ontologies and bundles"
                 arg_type = String
                 default = nothing
+            "--partition-size"
+                help = "Parition size for segmented updates"
+                arg_type = Int64
+                default = 100
         end
         return parse_args(s)
     end
@@ -113,37 +129,6 @@ module CreateOML
         iri = joinpath(base, stem)
         ns = iri * separator
         (iri, ns)
-    end
-
-    function create_quantity_or_unit_instance(instance_data, description_iri_stem, instance_id, namespace_base, has_identifier, base_or_derived, separator)
-        operations = []
-        (description_iri, description_ns) = ontology_iri_ns(
-            namespace_base, description_iri_stem, separator
-        )
-        instance_iri = description_ns * instance_id
-        append!(operations, [
-            create_instance(description_iri, instance_id),
-            add_assertion(description_iri, instance_iri, RDF_TYPE, base_or_derived),
-            add_annotation(description_iri, instance_iri, RDFS_LABEL, instance_data["name"]),
-            add_assertion(description_iri, instance_iri, has_identifier, instance_data["name"]),
-        ])
-
-        if haskey(instance_data, "symbols")
-            for symbol in instance_data["symbols"]
-                push!(operations,
-                    add_assertion(description_iri, instance_iri, HAS_SYMBOL, symbol)
-                )
-            end
-        end
-    
-        if haskey(instance_data, "alternate_names")
-            for alternate_name in instance_data["alternate_names"]
-                push!(operations,
-                    add_annotation(description_iri, instance_iri, RDFS_LABEL, alternate_name)
-                )
-            end
-        end
-        operations
     end
 
     function capitalize(string)
@@ -164,6 +149,8 @@ module CreateOML
         path_base = args["path-base"]
         separator = args["separator"]
         creator = args["creator"]
+
+        global_logger(ConsoleLogger(Info))
 
         # check server status
 
@@ -263,19 +250,19 @@ module CreateOML
         @info "$(now()) process si quantities"
         for (quantity_id, quantity_data) in input["si_quantities"]
             label = quantity_data["label"]
+            @info "$(now())   $label"
             si_label = quantity_data["si_label"]
             description_iri = first(ontology_iri_ns(namespace_base, quantity_data["description_iri_path"], separator))
             quantity_stem = encode_instance_stem(label)
             quantity_iri = description_iri * separator * quantity_stem
             quantity_class = quantity_data["classes"]["quantity"]
             si_quantity_class = SI_QUANTITY_CLASS[quantity_data["type"]]
-            @info "$(now())   $label"
-            append!(stage_3,
+            append!(stage_3, [
                 create_instance(description_iri, quantity_stem),
                 add_annotation(description_iri, quantity_iri, RDFS_LABEL, label),
                 add_annotation(description_iri, quantity_iri, RDFS_COMMENT, "type: si-v:$quantity_class"),
                 add_assertion(description_iri, quantity_iri, RDF_TYPE, si_quantity_class)
-            )
+            ])
             if !isnothing(si_label)
                 push!(stage_3, add_annotation(description_iri, quantity_iri, RDFS_LABEL, si_label))
             end
@@ -284,59 +271,23 @@ module CreateOML
         # process units
 
         @info "$(now()) process units"
-#=         for (unit_id, unit_data) in input["unit_instances"]
-            for description_iri_stem = unit_data["description_iri_stem"]
-                @info "$(now())   $(description_iri_stem) $unit_id"
-
-                # create quantity instance
-
-                append!(stage_1,
-                    create_quantity_or_unit_instance(
-                        unit_data,
-                        description_iri_stem,
-                        unit_id,
-                        namespace_base,
-                        HAS_UNIT_IDENTIFIER,
-                        unit_data["type"] == "Base" ? SI_BASE_UNIT : SI_DERIVED_UNIT,
-                        separator
-                    )
-                )
-
-                (description_iri, description_ns) = ontology_iri_ns(
-                    namespace_base, description_iri_stem, separator
-                )
-                unit_iri = description_ns * unit_id
-
-                # assert unit classes of instance
-                
-                vocabulary_iri_stem = companion_iri_stem(description_iri_stem, input["ontologies"])
-
-                for quantity in unit_data["quantity"]
-                    quantity_data = input["quantity_instances"][quantity]
-                    if vocabulary_iri_stem == quantity_data["vocabulary_iri_stem"]
-                        (vocabulary_iri, vocabulary_ns) = ontology_iri_ns(
-                            namespace_base, vocabulary_iri_stem, separator)
-                        unit_class = Dict(
-                            "datatypeIri" => XSD_ANYURI,
-                            "value" => vocabulary_iri * quantity_data["unit_class"]
-                        )
-                    
-                        @info "$(now())     assert $unit_id type $(quantity_data["unit_class"])"
-                        push!(stage_1,
-                            add_annotation(description_iri, unit_iri, DC_TYPE, unit_class)
-                        )
-                    end
-                end
-
-                # assert base unit expression for derived units
-
-                if unit_data["type"] != "Base" # some "Supplemental" and "Jenkins" junk in there
-                    push!(stage_1,
-                        add_assertion(description_iri, unit_iri, HAS_BASE_UNIT_EXPRESSION, unit_data["expression"])
-                    )
-                end
-            end
-        end =#
+        for (unit_id, unit_data) in input["si_units"]
+            label = unit_data["label"]
+            @info "$(now())   $label"
+            description_iri = first(ontology_iri_ns(namespace_base, unit_data["description_iri_path"], separator))
+            unit_stem = encode_instance_stem(label)
+            unit_iri = description_iri * separator * unit_stem
+            si_unit_class = SI_UNIT_CLASS[unit_data["type"]]
+            symbol = unit_data["symbol"]
+            unit_class = unit_data["class"]
+            append!(stage_3, [
+                create_instance(description_iri, unit_stem),
+                add_annotation(description_iri, unit_iri, RDFS_LABEL, label),
+                add_annotation(description_iri, unit_iri, RDFS_COMMENT, "type: si-v:$unit_class"),
+                add_assertion(description_iri, unit_iri, RDF_TYPE, si_unit_class),
+                add_assertion(description_iri, unit_iri, HAS_UNIT_SYMBOL, symbol)
+            ])
+        end
 
         # update server
 
@@ -346,7 +297,10 @@ module CreateOML
             @info "$(now()) update server"
             for (name, ops) in operations
                 @info "$(now())   $name $(length(ops)) operations"
-                update(server, ops, args["defer-diagnostics"])
+                for set in Iterators.partition(ops, args["partition-size"])
+                    @debug "$(now())     updating server with $(length(set)) operations"
+                    update(server, set, args["defer-diagnostics"])
+                end
             end
         end
 
