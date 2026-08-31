@@ -319,7 +319,7 @@ module IsqSiLibrary
             d = OrderedDict(
                 "label" => label,
                 "name" => name,
-                "symmbol" => symbol,
+                "symbol" => symbol,
                 "iri" => iri,
                 "vocabulary_iri_path" => vocabulary["iri_path"],
                 "description_iri_path" => description["iri_path"],
