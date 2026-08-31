@@ -201,11 +201,10 @@ module IsqSiLibrary
                     )
                 )
                 if type == "description"
-                    push!(d["imports"], replace(prefix, r"-db$" => "-vb"))
+                    push!(d["imports"], joinpath(bundle_path, BUNDLE_TYPES["vocabulary"]))
                 end
                 bundles[prefix] = d
             end
-
         end
 
         for row in eachrow(bundles_df)
