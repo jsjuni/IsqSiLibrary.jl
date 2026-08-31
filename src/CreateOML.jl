@@ -28,12 +28,18 @@ module CreateOML
     # rdfs vocabulary
 
     const RDFS_LABEL = "<http://www.w3.org/2000/01/rdf-schema#label>"
+    const RDFS_COMMENT = "<http://www.w3.org/2000/01/rdf-schema#comment>"
 
-    # vim3 vocabulary
+    # vim vocabulary
 
-    const IS_PROPERTY_OF = "<http://bipm.org/jcgm/vim3-v#isPropertyOf>"
-    const HAS_DIMENSION_SYMBOL = "<http://bipm.org/jcgm/vim3-v#hasDimensionSymbol>"
+    const IS_PROPERTY_OF = "<http://bipm.org/vim-v#isPropertyOf>"
+    const HAS_DIMENSION_SYMBOL = "<http://bipm.org/vim-v#hasDimensionSymbol>"
 
+    const SI_QUANTITY = "<http://bipm.org/vim-v#SIQuantity>"
+    const SI_BASE_QUANTITY = "<http://bipm.org/vim-v#SIBaseQuantity>"
+    const SI_NAMED_QUANTITY = "<http://bipm.org/vim-v#SINamedQuantity>"
+    const SI_NON_SI_QUANTITY = "<http://bipm.org/vim-v#SINonSIQuantity>"
+ 
     # iso 80000 vocabulary
 
     const HAS_QUANTITY_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasQuantityIdentifier>"
@@ -51,12 +57,20 @@ module CreateOML
 
     const HAS_BASE_UNIT_EXPRESSION = "<http://iso.org/iso-80000/1-v#hasBaseUnitExpression>"
 
-    # vim3 ontologies
+    # vim ontologies
 
-    const VIM3_VOCABULARY = "<http://bipm.org/jcgm/vim3-v>"
-    const VIM3_DESCRIPTION = "<http://bipm.org/jcgm/vim3-d"
+    const vim_VOCABULARY = "<http://bipm.org/vim-v>"
+    const vim_DESCRIPTION = "<http://bipm.org/vim-d"
 
     const PLURAL = Dict("quantity" => "quantities", "unit" => "units", "value" => "values")
+
+    const SI_QUANTITY_CLASS = Dict(
+        "base" => SI_BASE_QUANTITY,
+        "named" => SI_NAMED_QUANTITY,
+        "non-si" => SI_NON_SI_QUANTITY,
+        missing => SI_QUANTITY,
+        nothing => SI_QUANTITY
+    )
 
     function parse_commandline()
         s = ArgParseSettings()
@@ -246,68 +260,26 @@ module CreateOML
 
         # process quantities
 
-        @info "$(now()) process quantities"
-#=         for (quantity_id, quantity_data) in input["quantity_instances"]
-            @info "$(now())   $(quantity_data["description_iri_stem"]) $quantity_id"
-
-            # create quantity instance
-
-            append!(stage_1,
-                create_quantity_or_unit_instance(
-                    quantity_data,
-                    quantity_data["description_iri_stem"],
-                    quantity_id,
-                    namespace_base,
-                    HAS_QUANTITY_IDENTIFIER,
-                    quantity_data["type"] == "Base" ? ISQ_BASE_QUANTITY : ISQ_DERIVED_QUANTITY,
-                    separator
-                )
+        @info "$(now()) process si quantities"
+        for (quantity_id, quantity_data) in input["si_quantities"]
+            label = quantity_data["label"]
+            si_label = quantity_data["si_label"]
+            description_iri = first(ontology_iri_ns(namespace_base, quantity_data["description_iri_path"], separator))
+            quantity_stem = encode_instance_stem(label)
+            quantity_iri = description_iri * separator * quantity_stem
+            quantity_class = quantity_data["classes"]["quantity"]
+            si_quantity_class = SI_QUANTITY_CLASS[quantity_data["type"]]
+            @info "$(now())   $label"
+            append!(stage_3,
+                create_instance(description_iri, quantity_stem),
+                add_annotation(description_iri, quantity_iri, RDFS_LABEL, label),
+                add_annotation(description_iri, quantity_iri, RDFS_COMMENT, "type: si-v:$quantity_class"),
+                add_assertion(description_iri, quantity_iri, RDF_TYPE, si_quantity_class)
             )
-
-            (vocabulary_iri, vocabulary_ns) = ontology_iri_ns(
-                namespace_base, quantity_data["vocabulary_iri_stem"], separator
-            )
-            (description_iri, description_ns) = ontology_iri_ns(
-                namespace_base, quantity_data["description_iri_stem"], separator
-            )
-            quantity_iri = description_ns * quantity_id
-
-            # add identifier annotation and description
-
-            append!(stage_1, [
-                add_annotation(description_iri, quantity_iri, DC_IDENTIFIER, quantity_data["item"]),
-                add_annotation(description_iri, quantity_iri, DC_DESCRIPTION, quantity_data["description"])
-            ])
-
-            # create quantity classes
-
-            for category_key in ("quantity", "unit", "value")
-                concept = quantity_data["$(category_key)_class"]
-                description = "$(capitalize(PLURAL[category_key])) of quantity kind \"$(quantity_data["name"])\"."
-                @info "$(now())     create concept $vocabulary_ns$concept"
-                @info "$(now())       description: $description"
-                append!(stage_1, [
-                ])
+            if !isnothing(si_label)
+                push!(stage_3, add_annotation(description_iri, quantity_iri, RDFS_LABEL, si_label))
             end
-
-            # assert dimension symbol
-
-            push!(stage_1,
-                add_assertion(description_iri, quantity_iri, HAS_DIMENSION_SYMBOL, quantity_data["dimension_symbol"])
-            )
-
-            # assert quantity class of instance
-
-            @info "$(now())     assert $quantity_id type $(quantity_data["quantity_class"])"
-
-            # create quantity relation
-
-            @info "$(now())     create forward relation $vocabulary_ns$(quantity_data["relation"]["forward"])"
-            @info "$(now())            reverse relation $vocabulary_ns$(quantity_data["relation"]["reverse"])"
-            append!(stage_1, [
-            ])
-
-       end =#
+        end
 
         # process units
 
