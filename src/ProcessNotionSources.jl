@@ -135,17 +135,21 @@ module Main
         si_quantities = construct_si_quantities(ontologies, si_quantities_df, si_units_df)
         knowledge["si_quantities"] = si_quantities
 
+        #
+        # create si units
+        #
+
         @info "$(now()) create si units"
         si_units = construct_si_units(ontologies, si_quantities, si_units_df)
         knowledge["si_units"] = si_units
 
         #
-        # create isq entities
+        # create isq quantities
         #
 
-        @info "$(now()) create isq entities"
-        isq_entities = construct_isq_entities(ontologies, si_quantities_df, si_units_df, isq_quantities_df, isq_units_df)
-        knowledge["isq_entities"] = isq_entities
+        @info "$(now()) create isq quantities"
+        isq_quantities = construct_isq_quantities(ontologies, si_quantities, si_units, isq_quantities_df, isq_units_df)
+        knowledge["isq_quantities"] = isq_quantities
 
         #
         # write output
@@ -153,7 +157,7 @@ module Main
 
         @info "$(now()) saving $(length(si_quantities)) si quantities"
         @info "$(now()) saving $(length(si_units)) si units"
-        # @info "$(now()) saving $(length(isq_quantities)) isq quantities"
+        @info "$(now()) saving $(length(isq_quantities)) isq quantities"
         # @info "$(now()) saving $(length(isq_units)) isq units"
         output = (args["output"] == "" ? stdout : open(args["output"], "w"))
         JSON.json(output, knowledge, pretty = true)

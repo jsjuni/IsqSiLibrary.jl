@@ -333,9 +333,43 @@ module IsqSiLibrary
         units
     end
 
-    export construct_isq_entities
-    function construct_isq_entities(ontologies, si_quantities_df, si_units_df, isq_quantities_df, isq_units_df)
-        entities = initialize_dictionary()
+    export construct_isq_quantities
+    function construct_isq_quantities(ontologies, si_quantities, si_units, isq_quantities_df, isq_units_df)
+        quantities = initialize_dictionary()
+        for row in eachrow(isq_quantities_df)
+
+            # look up vocabulary and description info dicts
+
+            document_id = remove_md_link(row["Defining Document"])
+            (vocabulary, description) = get_ontologies(document_id, ontologies)
+
+            # set quantity properties and create quantity dict
+
+            label = row["Quantity"]
+            name = NamingConventions.convert(SpaceCase, SnakeCase, label)
+            source = row["Item"]
+            iri = "$(vocabulary["iri_path"])#$name"
+            classes = OrderedDict()
+            for (k, v) in QUANTITY_CLASSES
+                classes[k] = NamingConventions.convert(SpaceCase, PascalCase, strip("$label $v"))
+            end
+            d = OrderedDict(
+                "label" => label,
+                "name" => name,
+                "source" => source,
+                "iri" => iri,
+                "vocabulary_iri_path" => vocabulary["iri_path"],
+                "description_iri_path" => description["iri_path"],
+                "classes" => classes
+            )
+
+            # save quantity dict
+
+            quantities[iri] = d
+        
+        end
+
+        quantities
     end
 
     export construct_quantity_instances
