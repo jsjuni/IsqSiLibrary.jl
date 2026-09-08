@@ -237,18 +237,9 @@ module IsqSiLibrary
 
         for row in eachrow(si_quantities_df)
 
-            # quantities for named units only
-
-            if row["Anonymous Unit"] == "Yes"
-                continue
-            end
-
             # quantity type (base, derived, etc.) follows from highest unit type
 
             units = collect(unique(mapfoldl(c -> get_keys(row[c]), append!, ["Units By Symbol", "Units By URI"])))
-            if isempty(units)
-                continue
-            end
             unit_types = map(u -> SI_UNIT_TYPES[u], si_units_df[in.(si_units_df.Unit, [units]), :Type])
             type = if any(unit_types .== "base")
                 "base"
@@ -368,6 +359,18 @@ module IsqSiLibrary
                     eachrow(isq_quantity_symbols_df)
                 )
             )
+            related_si_qty_label = row["Related SI Quantity"]
+            related_si_quantity = if ismissing(related_si_qty_label)
+                    nothing
+                else
+                    first(map(
+                    h -> h["iri"],
+                        filter(
+                            d -> d["label"] == remove_md_link(row["Related SI Quantity"]),
+                            collect(values(si_quantities))
+                        )
+                    ))
+                end
             d = OrderedDict(
                 "label" => label,
                 "name" => name,
@@ -377,7 +380,8 @@ module IsqSiLibrary
                 "description_iri_path" => description["iri_path"],
                 "classes" => classes,
                 "alternate_names" => alternate_names,
-                "symbols" => symbols
+                "symbols" => symbols,
+                "related_si_quantity" => related_si_quantity
             )
 
             # save quantity dict

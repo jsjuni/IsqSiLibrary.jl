@@ -245,7 +245,7 @@ module CreateOML
             end
         end
 
-        # process quantities
+        # process si quantities
 
         @info "$(now()) process si quantities"
         for (quantity_id, quantity_data) in input["si_quantities"]
@@ -268,7 +268,7 @@ module CreateOML
             end
         end
 
-        # process units
+        # process si units
 
         @info "$(now()) process units"
         for (unit_id, unit_data) in input["si_units"]
