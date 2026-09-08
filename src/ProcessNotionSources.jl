@@ -159,6 +159,14 @@ module Main
         knowledge["isq_quantities"] = isq_quantities
 
         #
+        # create isq units
+        #
+
+        @info "$(now()) create isq units"
+        isq_units = construct_isq_units(ontologies, si_quantities, si_units, isq_quantities, isq_units_df)
+        knowledge["isq_units"] = isq_units
+
+        #
         # write output
         #
 

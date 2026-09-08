@@ -393,6 +393,14 @@ module IsqSiLibrary
         quantities
     end
 
+    export construct_isq_units
+    function construct_isq_units(ontologies, si_quantities, si_units, isq_quantities, isq_units_df)
+
+        units = initialize_dictionary()
+
+        units
+    end
+
     export construct_quantity_instances
     function construct_quantity_instances(quantities, ontologies, symbols)
         quantity_instances = initialize_dictionary()

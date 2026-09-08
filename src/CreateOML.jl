@@ -260,7 +260,7 @@ module CreateOML
             append!(stage_3, [
                 create_instance(description_iri, quantity_stem),
                 add_annotation(description_iri, quantity_iri, RDFS_LABEL, label),
-                add_annotation(description_iri, quantity_iri, RDFS_COMMENT, "type: si-v:$quantity_class"),
+                add_annotation(description_iri, quantity_iri, RDFS_COMMENT, "type: $quantity_class"),
                 add_assertion(description_iri, quantity_iri, RDF_TYPE, si_quantity_class)
             ])
             if !isnothing(si_label)
@@ -270,7 +270,7 @@ module CreateOML
 
         # process si units
 
-        @info "$(now()) process units"
+        @info "$(now()) process si units"
         for (unit_id, unit_data) in input["si_units"]
             label = unit_data["label"]
             @info "$(now())   $label"
@@ -283,8 +283,44 @@ module CreateOML
             append!(stage_3, [
                 create_instance(description_iri, unit_stem),
                 add_annotation(description_iri, unit_iri, RDFS_LABEL, label),
-                add_annotation(description_iri, unit_iri, RDFS_COMMENT, "type: si-v:$unit_class"),
+                add_annotation(description_iri, unit_iri, RDFS_COMMENT, "type: $unit_class"),
                 add_assertion(description_iri, unit_iri, RDF_TYPE, si_unit_class),
+                add_assertion(description_iri, unit_iri, HAS_UNIT_SYMBOL, symbol)
+            ])
+        end
+
+        # process isq quantities
+
+        @info "$(now()) process isq quantities"
+        for (quantity_id, quantity_data) in input["isq_quantities"]
+            label = quantity_data["label"]
+            @info "$(now())   $label"
+            description_iri = first(ontology_iri_ns(namespace_base, quantity_data["description_iri_path"], separator))
+            quantity_stem = encode_instance_stem(label)
+            quantity_iri = description_iri * separator * quantity_stem
+            quantity_class = quantity_data["classes"]["quantity"]
+            append!(stage_3, [
+                create_instance(description_iri, quantity_stem),
+                add_annotation(description_iri, quantity_iri, RDFS_LABEL, label),
+                add_annotation(description_iri, quantity_iri, RDFS_COMMENT, "type: $quantity_class")
+            ])
+        end
+        
+        # process isq units
+
+        @info "$(now()) process isq units"
+        for (unit_id, unit_data) in input["isq_units"]
+            label = unit_data["label"]
+            @info "$(now())   $label"
+            description_iri = first(ontology_iri_ns(namespace_base, unit_data["description_iri_path"], separator))
+            unit_stem = encode_instance_stem(label)
+            unit_iri = description_iri * separator * unit_stem
+            symbol = unit_data["symbol"]
+            unit_class = unit_data["class"]
+            append!(stage_3, [
+                create_instance(description_iri, unit_stem),
+                add_annotation(description_iri, unit_iri, RDFS_LABEL, label),
+                add_annotation(description_iri, unit_iri, RDFS_COMMENT, "type: $unit_class"),
                 add_assertion(description_iri, unit_iri, HAS_UNIT_SYMBOL, symbol)
             ])
         end
