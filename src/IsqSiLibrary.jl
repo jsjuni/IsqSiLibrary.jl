@@ -304,7 +304,7 @@ module IsqSiLibrary
                 qd -> qd["label"] == quantity_label,
                 collect(values(si_quantities))
             ))
-            quantity_class = quantity_dict["classes"]["quantity"]
+            quantity_class = quantity_dict["classes"]["unit"]
  
             document_id = remove_md_link(row["Defining Documents"])
             (vocabulary, description) = get_ontologies(document_id, ontologies)
@@ -334,7 +334,7 @@ module IsqSiLibrary
     end
 
     export construct_isq_quantities
-    function construct_isq_quantities(ontologies, si_quantities, si_units, isq_quantities_df, isq_units_df)
+    function construct_isq_quantities(ontologies, si_quantities, si_units, isq_quantities_df, isq_alternate_quantity_names_df, isq_units_df)
         quantities = initialize_dictionary()
         for row in eachrow(isq_quantities_df)
 
@@ -353,6 +353,13 @@ module IsqSiLibrary
             for (k, v) in QUANTITY_CLASSES
                 classes[k] = NamingConventions.convert(SpaceCase, PascalCase, strip("$label $v"))
             end
+            alternate_names = map(
+                r -> r["Alternate Name"],
+                filter(
+                    r -> remove_md_link(r["Derived Quantity"]) == label,
+                    eachrow(isq_alternate_quantity_names_df)
+                )
+            )
             d = OrderedDict(
                 "label" => label,
                 "name" => name,
@@ -360,7 +367,8 @@ module IsqSiLibrary
                 "iri" => iri,
                 "vocabulary_iri_path" => vocabulary["iri_path"],
                 "description_iri_path" => description["iri_path"],
-                "classes" => classes
+                "classes" => classes,
+                "alternate_names" => alternate_names
             )
 
             # save quantity dict
