@@ -334,7 +334,8 @@ module IsqSiLibrary
     end
 
     export construct_isq_quantities
-    function construct_isq_quantities(ontologies, si_quantities, si_units, isq_quantities_df, isq_alternate_quantity_names_df, isq_units_df)
+    function construct_isq_quantities(ontologies, si_quantities, si_units, isq_quantities_df,
+            isq_alternate_quantity_names_df, isq_quantity_symbols_df, isq_units_df)
         quantities = initialize_dictionary()
         for row in eachrow(isq_quantities_df)
 
@@ -356,8 +357,15 @@ module IsqSiLibrary
             alternate_names = map(
                 r -> r["Alternate Name"],
                 filter(
-                    r -> remove_md_link(r["Derived Quantity"]) == label,
+                    r -> label in get_keys(r["Derived Quantity"]),
                     eachrow(isq_alternate_quantity_names_df)
+                )
+            )
+            symbols = map(
+                r -> r["LaTeX"],
+                filter(
+                    r -> label in get_keys(r["📐 ISQ Quantities"]),
+                    eachrow(isq_quantity_symbols_df)
                 )
             )
             d = OrderedDict(
@@ -368,7 +376,8 @@ module IsqSiLibrary
                 "vocabulary_iri_path" => vocabulary["iri_path"],
                 "description_iri_path" => description["iri_path"],
                 "classes" => classes,
-                "alternate_names" => alternate_names
+                "alternate_names" => alternate_names,
+                "symbols" => symbols
             )
 
             # save quantity dict

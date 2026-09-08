@@ -107,6 +107,9 @@ module Main
         @info "$(now()) loading isq alternate quantity names source $(args["isq-alternate-quantity-names"])"
         isq_alternate_quantity_names_df = load_csv_document(args["sources-path-prefix"], args["isq-alternate-quantity-names"])
 
+        @info "$(now()) loading isq quantity symbols source $(args["isq-quantity-symbols"])"
+        isq_quantity_symbols_df = load_csv_document(args["sources-path-prefix"], args["isq-quantity-symbols"])
+
         @info "$(now()) loading isq units source $(args["isq-units"])"
         isq_units_df = load_csv_document(args["sources-path-prefix"], args["isq-units"])
 
@@ -151,7 +154,8 @@ module Main
         #
 
         @info "$(now()) create isq quantities"
-        isq_quantities = construct_isq_quantities(ontologies, si_quantities, si_units, isq_quantities_df, isq_alternate_quantity_names_df, isq_units_df)
+        isq_quantities = construct_isq_quantities(ontologies, si_quantities, si_units, isq_quantities_df,
+            isq_alternate_quantity_names_df, isq_quantity_symbols_df, isq_units_df)
         knowledge["isq_quantities"] = isq_quantities
 
         #
