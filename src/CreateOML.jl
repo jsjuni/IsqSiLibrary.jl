@@ -32,6 +32,9 @@ module CreateOML
 
     # vim vocabulary
 
+    const HAS_QUANTITY_IDENTIFIER = "<http://bipm.org/vim-v#hasQuantityIdentifier>"
+    const HAS_MEASUREMENT_UNIT_IDENTIFIER = "<http://bipm.org/vim-v#hasMeasurementUnitIdentifier>"
+
     const IS_PROPERTY_OF = "<http://bipm.org/vim-v#isPropertyOf>"
     const HAS_DIMENSION_SYMBOL = "<http://bipm.org/vim-v#hasDimensionSymbol>"
 
@@ -49,22 +52,17 @@ module CreateOML
 
     # iso 80000 vocabulary
 
-    const HAS_QUANTITY_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasQuantityIdentifier>"
-    const HAS_UNIT_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasUnitIdentifier>"
-    const HAS_SYMBOL = "<http://iso.org/iso-80000/1-v#hasSymbol>"
+    const HAS_SYMBOL = "<http://iso-iec/iso.org/iso-80000/1-v#hasSymbol>"
 
-    const ISQ_BASE_QUANTITY = "<http://iso.org/iso-80000/1-v#ISQBaseQuantity>"
-    const ISQ_DERIVED_QUANTITY = "<http://iso.org/iso-80000/1-v#ISQDerivedQuantity>"
+    const ISQ_BASE_QUANTITY = "<http://iso-iec/iso.org/iso-80000/1-v#ISQBaseQuantity>"
+    const ISQ_DERIVED_QUANTITY = "<http://iso-iec/iso.org/iso-80000/1-v#ISQDerivedQuantity>"
     
-    const IS_BASE_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isBaseUnitFor>"
-    const IS_DERIVED_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isDerivedUnitFor>"
+    const IS_BASE_UNIT_FOR = "<http://iso-iec/iso.org/iso-80000/1-v#isBaseUnitFor>"
+    const IS_DERIVED_UNIT_FOR = "<http://iso-iec/iso.org/iso-80000/1-v#isDerivedUnitFor>"
 
-    const HAS_BASE_UNIT_EXPRESSION = "<http://iso.org/iso-80000/1-v#hasBaseUnitExpression>"
+    const HAS_BASE_UNIT_EXPRESSION = "<http://iso-iec/iso.org/iso-80000/1-v#hasBaseUnitExpression>"
 
-    # vim ontologies
-
-    const vim_VOCABULARY = "<http://bipm.org/vim-v>"
-    const vim_DESCRIPTION = "<http://bipm.org/vim-d"
+    # other constants
 
     const PLURAL = Dict("quantity" => "quantities", "unit" => "units", "value" => "values")
 
@@ -260,6 +258,7 @@ module CreateOML
             append!(stage_3, [
                 create_instance(description_iri, quantity_stem),
                 add_annotation(description_iri, quantity_iri, RDFS_LABEL, label),
+                add_assertion(description_iri, quantity_iri, HAS_QUANTITY_IDENTIFIER, label),
                 add_annotation(description_iri, quantity_iri, RDFS_COMMENT, "type: $quantity_class"),
                 add_assertion(description_iri, quantity_iri, RDF_TYPE, si_quantity_class)
             ])
@@ -283,6 +282,7 @@ module CreateOML
             append!(stage_3, [
                 create_instance(description_iri, unit_stem),
                 add_annotation(description_iri, unit_iri, RDFS_LABEL, label),
+                add_assertion(description_iri, unit_iri, HAS_MEASUREMENT_UNIT_IDENTIFIER, label),
                 add_annotation(description_iri, unit_iri, RDFS_COMMENT, "type: $unit_class"),
                 add_assertion(description_iri, unit_iri, RDF_TYPE, si_unit_class),
                 add_assertion(description_iri, unit_iri, HAS_UNIT_SYMBOL, symbol)
@@ -302,6 +302,7 @@ module CreateOML
             append!(stage_3, [
                 create_instance(description_iri, quantity_stem),
                 add_annotation(description_iri, quantity_iri, RDFS_LABEL, label),
+                add_assertion(description_iri, quantity_iri, HAS_QUANTITY_IDENTIFIER, label),
                 add_annotation(description_iri, quantity_iri, RDFS_COMMENT, "type: $quantity_class")
             ])
         end
@@ -318,16 +319,15 @@ module CreateOML
             symbol = unit_data["symbol"]
             append!(stage_3, [
                 create_instance(description_iri, unit_stem),
-                add_annotation(description_iri, unit_iri, RDFS_LABEL, label)
+                add_annotation(description_iri, unit_iri, RDFS_LABEL, label),
+                add_assertion(description_iri, unit_iri, HAS_MEASUREMENT_UNIT_IDENTIFIER, label)
             ])
             if !isnothing(symbol)
                 push!(stage_3, add_assertion(description_iri, unit_iri, HAS_UNIT_SYMBOL, symbol))
             end
-            @show values(unit_data["classes"])
             for classes in values(unit_data["classes"])
                 for class in classes
-                    @show class
-                    push!(stage_3, add_annotation(description_iri, unit_iri, RDFS_COMMENT, class))
+                    push!(stage_3, add_annotation(description_iri, unit_iri, RDFS_COMMENT, "type: $class"))
                 end
             end
         end
