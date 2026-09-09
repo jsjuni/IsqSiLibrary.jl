@@ -191,11 +191,6 @@ module CreateOML
                 (iri, ns) = ontology_iri_ns(namespace_base, ontology_data["iri_path"], separator)
                 label = ontology_data["label"]
                 source = "$label $(ontology_data["title"])"
-                @info "$(now())     delete"
-                if !args["inhibit-updates"]
-                    push!(stage_2, delete_ontology(iri))
-                end
-                @info "$(now())     create"
                 append!(stage_3, [
                     create_ontology(
                         ontology_data["type"],
@@ -220,11 +215,6 @@ module CreateOML
             @info "$(now())   $bundle_id"
             (iri, ns) = ontology_iri_ns(namespace_base, bundle_data["iri_path"], separator)
             type = "$(bundle_data["type"]) bundle"
-            @info "$(now())     delete"
-            if !args["inhibit-updates"]
-                push!(stage_1, delete_ontology(iri))
-            end
-            @info "$(now())     create"
             append!(stage_3, [
                 create_ontology(
                     type,
@@ -291,7 +281,6 @@ module CreateOML
                     qd_iri = first(ontology_iri_ns(namespace_base, qd_iri_path, separator))
                     quantity_stem = encode_instance_stem(q_label)
                     quantity_iri = qd_iri * separator * quantity_stem
-                    @info "$(now())     quantity $quantity_iri"
                     push!(stage_3, add_assertion(description_iri, unit_iri, IS_MEASUREMENT_UNIT_FOR, quantity_iri))
                 end
             end
