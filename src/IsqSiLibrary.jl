@@ -429,8 +429,9 @@ module IsqSiLibrary
                 d = OrderedDict(
                     "label" => label,
                     "name" => name,
-                    "symbol" => symbol,
+                    # "symbol" => symbol,
                     "iri" => iri,
+                    "description_iri_path" => description_iri_path,
                     "classes" => class_dict
                 )
 

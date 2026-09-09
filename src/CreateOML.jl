@@ -316,13 +316,20 @@ module CreateOML
             unit_stem = encode_instance_stem(label)
             unit_iri = description_iri * separator * unit_stem
             symbol = unit_data["symbol"]
-            unit_class = unit_data["class"]
             append!(stage_3, [
                 create_instance(description_iri, unit_stem),
-                add_annotation(description_iri, unit_iri, RDFS_LABEL, label),
-                add_annotation(description_iri, unit_iri, RDFS_COMMENT, "type: $unit_class"),
-                add_assertion(description_iri, unit_iri, HAS_UNIT_SYMBOL, symbol)
+                add_annotation(description_iri, unit_iri, RDFS_LABEL, label)
             ])
+            if !isnothing(symbol)
+                push!(stage_3, add_assertion(description_iri, unit_iri, HAS_UNIT_SYMBOL, symbol))
+            end
+            @show values(unit_data["classes"])
+            for classes in values(unit_data["classes"])
+                for class in classes
+                    @show class
+                    push!(stage_3, add_annotation(description_iri, unit_iri, RDFS_COMMENT, class))
+                end
+            end
         end
 
         # update server
