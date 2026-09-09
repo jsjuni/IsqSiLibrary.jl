@@ -339,7 +339,12 @@ module CreateOML
             if !isnothing(symbol)
                 push!(stage_3, add_assertion(description_iri, unit_iri, HAS_UNIT_SYMBOL, symbol))
             end
-            for classes in values(unit_data["classes"])
+            for quantity_label = unit_data["quantities"]
+                quantity_stem = encode_instance_stem(quantity_label)
+                quantity_iri = description_iri * separator * quantity_stem
+                push!(stage_3, add_assertion(description_iri, unit_iri, IS_MEASUREMENT_UNIT_FOR, quantity_iri))
+            end
+            for classes in values(unit_data["quantity_classes"])
                 for class in classes
                     push!(stage_3, add_annotation(description_iri, unit_iri, RDFS_COMMENT, "type: $class"))
                 end

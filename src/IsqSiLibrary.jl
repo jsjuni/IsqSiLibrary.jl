@@ -407,7 +407,7 @@ module IsqSiLibrary
         for row in eachrow(isq_units_df)
 
             label = row["Unit"]
-            quantities = filter(
+            quantity_dicts = filter(
                 d -> d["label"] in get_keys(row["ISQ Quantities"]),
                 collect(values(isq_quantities))
             )
@@ -416,15 +416,16 @@ module IsqSiLibrary
                     d_iri_path = qd["description_iri_path"]
                     v_iri_path = qd["vocabulary_iri_path"]
                     if !haskey(ad, d_iri_path)
-                        ad[d_iri_path] = Dict()
+                        ad[d_iri_path] = Dict("quantities" => [], "classes" => Dict())
                     end
-                    if !haskey(ad[d_iri_path], v_iri_path)
-                        ad[d_iri_path][v_iri_path] = []
+                    push!(ad[d_iri_path]["quantities"], qd["label"])
+                    if !haskey(ad[d_iri_path]["classes"], v_iri_path)
+                        ad[d_iri_path]["classes"][v_iri_path] = []
                     end
-                    push!(ad[d_iri_path][v_iri_path], qd["classes"]["unit"])
+                    push!(ad[d_iri_path]["classes"][v_iri_path], qd["classes"]["unit"])
                     ad
                 end,
-                quantities,
+                quantity_dicts,
                 init = Dict()
             )
 
@@ -432,7 +433,7 @@ module IsqSiLibrary
 
             name = NamingConventions.convert(SpaceCase, SnakeCase, label)
             symbol = row["Symbol"]
-            for (description_iri_path, class_dict) in ontology_map
+            for (description_iri_path, ontology_dict) in ontology_map
                 iri = "$(description_iri_path)#$name"
                 d = OrderedDict(
                     "label" => label,
@@ -440,7 +441,8 @@ module IsqSiLibrary
                     "symbol" => symbol,
                     "iri" => iri,
                     "description_iri_path" => description_iri_path,
-                    "classes" => class_dict
+                    "quantities" => ontology_dict["quantities"],
+                    "quantity_classes" => ontology_dict["classes"]
                 )
 
                 units[iri] = d
