@@ -315,6 +315,12 @@ module CreateOML
             ])
             append!(stage_3,
                 map(
+                    s -> add_assertion(description_iri, quantity_iri, HAS_SYMBOL, s),
+                    quantity_data["symbols"]
+                )
+            )
+            append!(stage_3,
+                map(
                     n -> add_annotation(description_iri, quantity_iri, RDFS_LABEL, n),
                     quantity_data["alternate_names"]
                 )
