@@ -74,14 +74,10 @@ $(STAGE_2_OUTPUT)/quantities.csv: $(STAGE_1_OUTPUT)/quantities.json $(STAGE_2_OU
 .PHONY: stage_3
 
 # EXPORT_ZIP passed via -e on make command line
-EXPORT_BLOCK_ZIP = ExportBlock.zip
 EXPORT_SENTINEL = .sentinel
 
 stage_3: $(STAGE_3_OUTPUT)/$(EXPORT_SENTINEL)
 
-$(STAGE_3_OUTPUT)/$(EXPORT_BLOCK_ZIP): $(EXPORT_ZIP)
-	unzip -p $< > $@
-
-$(STAGE_3_OUTPUT)/$(EXPORT_SENTINEL): $(STAGE_3_OUTPUT)/$(EXPORT_BLOCK_ZIP)
+$(STAGE_3_OUTPUT)/$(EXPORT_SENTINEL): $(EXPORT_ZIP)
 	unzip -o -d $(STAGE_3_OUTPUT) $< '*.csv' -x "*_all.csv" && touch $@
 
