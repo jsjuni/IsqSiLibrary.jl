@@ -305,6 +305,12 @@ module CreateOML
                 add_assertion(description_iri, quantity_iri, HAS_QUANTITY_IDENTIFIER, label),
                 add_annotation(description_iri, quantity_iri, RDFS_COMMENT, "type: $quantity_class")
             ])
+            append!(stage_3,
+                map(
+                    n -> add_annotation(description_iri, quantity_iri, RDFS_LABEL, n),
+                    quantity_data["alternate_names"]
+                )
+            )
         end
         
         # process isq units
