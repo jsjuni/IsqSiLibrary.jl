@@ -290,12 +290,19 @@ module IsqSiLibrary
 
         for row in eachrow(si_units_df)
 
-            quantity_label = remove_md_link(row["QuantityKindsByURI"])
-            quantity_dict = first(filter(
-                qd -> qd["label"] == quantity_label,
+            quantity_labels = append!(get_keys(row["QuantityKindsByURI"]), get_keys(row["QuantityKindsByUnitSymbol"]))
+            quantity_dicts = filter(
+                qd -> qd["label"] in quantity_labels,
                 collect(values(si_quantities))
-            ))
-            quantity_class = quantity_dict["classes"]["unit"]
+            )
+            quantities = map(
+                d -> Dict(d["description_iri_path"] => d["label"]),
+                quantity_dicts
+            )
+            quantity_classes = map(
+                d -> Dict(d["vocabulary_iri_path"] => d["classes"]),
+                quantity_dicts
+            )
  
             document_id = remove_md_link(row["Defining Documents"])
             (vocabulary, description) = get_ontologies(document_id, ontologies)
@@ -315,7 +322,8 @@ module IsqSiLibrary
                 "vocabulary_iri_path" => vocabulary["iri_path"],
                 "description_iri_path" => description["iri_path"],
                 "type" => type,
-                "class" => quantity_class
+                "quantities" => quantities,
+                "quantity_classes" => quantity_classes
             )
 
             units[iri] = d
@@ -429,7 +437,7 @@ module IsqSiLibrary
                 d = OrderedDict(
                     "label" => label,
                     "name" => name,
-                    # "symbol" => symbol,
+                    "symbol" => symbol,
                     "iri" => iri,
                     "description_iri_path" => description_iri_path,
                     "classes" => class_dict

@@ -35,6 +35,7 @@ module CreateOML
     const HAS_QUANTITY_IDENTIFIER = "<http://bipm.org/vim-v#hasQuantityIdentifier>"
     const HAS_MEASUREMENT_UNIT_IDENTIFIER = "<http://bipm.org/vim-v#hasMeasurementUnitIdentifier>"
 
+    const IS_MEASUREMENT_UNIT_FOR = "<http://bipm.org/vim-v#isMeasurementUnitFor>"
     const IS_PROPERTY_OF = "<http://bipm.org/vim-v#isPropertyOf>"
     const HAS_DIMENSION_SYMBOL = "<http://bipm.org/vim-v#hasDimensionSymbol>"
 
@@ -278,15 +279,22 @@ module CreateOML
             unit_iri = description_iri * separator * unit_stem
             si_unit_class = SI_UNIT_CLASS[unit_data["type"]]
             symbol = unit_data["symbol"]
-            unit_class = unit_data["class"]
             append!(stage_3, [
                 create_instance(description_iri, unit_stem),
                 add_annotation(description_iri, unit_iri, RDFS_LABEL, label),
                 add_assertion(description_iri, unit_iri, HAS_MEASUREMENT_UNIT_IDENTIFIER, label),
-                add_annotation(description_iri, unit_iri, RDFS_COMMENT, "type: $unit_class"),
                 add_assertion(description_iri, unit_iri, RDF_TYPE, si_unit_class),
                 add_assertion(description_iri, unit_iri, HAS_UNIT_SYMBOL, symbol)
             ])
+            for qd in unit_data["quantities"]
+                for (qd_iri_path, q_label) in qd
+                    qd_iri = first(ontology_iri_ns(namespace_base, qd_iri_path, separator))
+                    quantity_stem = encode_instance_stem(q_label)
+                    quantity_iri = qd_iri * separator * quantity_stem
+                    @info "$(now())     quantity $quantity_iri"
+                    push!(stage_3, add_assertion(description_iri, unit_iri, IS_MEASUREMENT_UNIT_FOR, quantity_iri))
+                end
+            end
         end
 
         # process isq quantities
