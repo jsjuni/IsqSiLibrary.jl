@@ -309,6 +309,7 @@ module CreateOML
             quantity_class = quantity_data["classes"]["quantity"]
             append!(stage_3, [
                 create_instance(description_iri, quantity_stem),
+                add_assertion(description_iri, quantity_iri, RDF_TYPE, SI_QUANTITY), # TEMPORARY
                 add_annotation(description_iri, quantity_iri, RDFS_LABEL, label),
                 add_assertion(description_iri, quantity_iri, HAS_QUANTITY_IDENTIFIER, label),
                 add_annotation(description_iri, quantity_iri, RDFS_COMMENT, "type: $quantity_class")
@@ -339,6 +340,7 @@ module CreateOML
             symbol = unit_data["symbol"]
             append!(stage_3, [
                 create_instance(description_iri, unit_stem),
+                add_assertion(description_iri, unit_iri, RDF_TYPE, SI_UNIT), # TEMPORARY
                 add_annotation(description_iri, unit_iri, RDFS_LABEL, label),
                 add_assertion(description_iri, unit_iri, HAS_MEASUREMENT_UNIT_IDENTIFIER, label)
             ])
