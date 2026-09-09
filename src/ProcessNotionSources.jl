@@ -173,7 +173,7 @@ module Main
         @info "$(now()) saving $(length(si_quantities)) si quantities"
         @info "$(now()) saving $(length(si_units)) si units"
         @info "$(now()) saving $(length(isq_quantities)) isq quantities"
-        # @info "$(now()) saving $(length(isq_units)) isq units"
+        @info "$(now()) saving $(length(isq_units)) isq units"
         output = (args["output"] == "" ? stdout : open(args["output"], "w"))
         JSON.json(output, knowledge, pretty = true)
         

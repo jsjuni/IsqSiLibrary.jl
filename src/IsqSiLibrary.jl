@@ -395,8 +395,48 @@ module IsqSiLibrary
 
     export construct_isq_units
     function construct_isq_units(ontologies, si_quantities, si_units, isq_quantities, isq_units_df)
-
         units = initialize_dictionary()
+        for row in eachrow(isq_units_df)
+
+            label = row["Unit"]
+            quantities = filter(
+                d -> d["label"] in get_keys(row["ISQ Quantities"]),
+                collect(values(isq_quantities))
+            )
+            ontology_map = foldl(
+                function(ad, qd)
+                    d_iri_path = qd["description_iri_path"]
+                    v_iri_path = qd["vocabulary_iri_path"]
+                    if !haskey(ad, d_iri_path)
+                        ad[d_iri_path] = Dict()
+                    end
+                    if !haskey(ad[d_iri_path], v_iri_path)
+                        ad[d_iri_path][v_iri_path] = []
+                    end
+                    push!(ad[d_iri_path][v_iri_path], qd["classes"]["unit"])
+                    ad
+                end,
+                quantities,
+                init = Dict()
+            )
+
+            # set unit properties and create unit dict
+
+            name = NamingConventions.convert(SpaceCase, SnakeCase, label)
+            symbol = row["Symbol"]
+            for (description_iri_path, class_dict) in ontology_map
+                iri = "$(description_iri_path)#$name"
+                d = OrderedDict(
+                    "label" => label,
+                    "name" => name,
+                    "symbol" => symbol,
+                    "iri" => iri,
+                    "classes" => class_dict
+                )
+
+                units[iri] = d
+            end
+        end
 
         units
     end
