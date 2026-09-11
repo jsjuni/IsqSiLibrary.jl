@@ -120,6 +120,9 @@ module CreateOML
                 help = "Parition size for segmented updates"
                 arg_type = Int64
                 default = 100
+            "--save-operations"
+                arg_type = String
+                default = nothing
         end
         return parse_args(s)
     end
@@ -361,6 +364,16 @@ module CreateOML
                     update(server, set, args["defer-diagnostics"])
                 end
             end
+        end
+
+        # save operations if requested
+
+        operations_filename = args["save-operations"]
+        if !isnothing(args["save-operations"])
+            @info "$(now()) save operations to $operations_filename"
+            operations_file = open(operations_filename, "w")
+            operations = Dict("stage_1" => stage_1, "stage_2" => stage_2, "stage_3" => stage_3, "stage_4" => stage_4)
+            JSON.json(operations_file, operations, pretty = true)
         end
 
         # end

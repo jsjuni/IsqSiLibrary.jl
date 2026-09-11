@@ -17,6 +17,7 @@
                 "--path-base", "${workspaceFolder}/build/oml",
                 "--namespace-base", "http://",
                 "--partition-size", "1",
+                "--save-operations", "${workspaceFolder}/build/json/CreateOML-operations.json"
                 //"--defer-diagnostics"//, "--inhibit-updates"
             ]
         },
