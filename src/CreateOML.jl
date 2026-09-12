@@ -53,11 +53,13 @@ module CreateOML
 
     # iso 80000 vocabulary
 
-    const HAS_SYMBOL = "<http://iso-iec/iso.org/iso-80000/1-v#hasSymbol>"
+    const HAS_QUANTITY_SYMBOL = "<http://iso-iec/iso.org/iso-80000/1-v#hasQuantitySymbol>"
 
+    const ISQ_QUANTITY = "<http://iso-iec/iso.org/iso-80000/1-v#ISQQuantity>"
     const ISQ_BASE_QUANTITY = "<http://iso-iec/iso.org/iso-80000/1-v#ISQBaseQuantity>"
     const ISQ_DERIVED_QUANTITY = "<http://iso-iec/iso.org/iso-80000/1-v#ISQDerivedQuantity>"
     
+    const ISQ_UNIT = "<http://iso-iec/iso.org/iso-80000/1-v#ISQUnit>"
     const IS_BASE_UNIT_FOR = "<http://iso-iec/iso.org/iso-80000/1-v#isBaseUnitFor>"
     const IS_DERIVED_UNIT_FOR = "<http://iso-iec/iso.org/iso-80000/1-v#isDerivedUnitFor>"
 
@@ -301,14 +303,14 @@ module CreateOML
             quantity_class = quantity_data["classes"]["quantity"]
             append!(stage_3, [
                 create_instance(description_iri, quantity_stem),
-                add_assertion(description_iri, quantity_iri, RDF_TYPE, SI_QUANTITY), # TEMPORARY
+                add_assertion(description_iri, quantity_iri, RDF_TYPE, ISQ_QUANTITY), # TEMPORARY
                 add_annotation(description_iri, quantity_iri, RDFS_LABEL, label),
                 add_assertion(description_iri, quantity_iri, HAS_QUANTITY_IDENTIFIER, label),
                 add_annotation(description_iri, quantity_iri, RDFS_COMMENT, "type: $quantity_class")
             ])
             append!(stage_3,
                 map(
-                    s -> add_assertion(description_iri, quantity_iri, HAS_SYMBOL, s),
+                    s -> add_assertion(description_iri, quantity_iri, HAS_QUANTITY_SYMBOL, s),
                     quantity_data["symbols"]
                 )
             )
@@ -332,7 +334,7 @@ module CreateOML
             symbol = unit_data["symbol"]
             append!(stage_3, [
                 create_instance(description_iri, unit_stem),
-                add_assertion(description_iri, unit_iri, RDF_TYPE, SI_UNIT), # TEMPORARY
+                add_assertion(description_iri, unit_iri, RDF_TYPE, ISQ_UNIT), # TEMPORARY
                 add_annotation(description_iri, unit_iri, RDFS_LABEL, label),
                 add_assertion(description_iri, unit_iri, HAS_MEASUREMENT_UNIT_IDENTIFIER, label)
             ])
