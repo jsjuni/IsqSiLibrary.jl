@@ -167,6 +167,14 @@ module Main
         knowledge["isq_units"] = isq_units
 
         #
+        # reconcile units
+        #
+
+        @info "$(now()) reconcile isq units"
+        isq_unit_reconciliation = reconcile_isq_units(isq_units)
+        knowledge["isq_unit_reconciliation"] = isq_unit_reconciliation
+        
+        #
         # write output
         #
 

@@ -452,71 +452,26 @@ module IsqSiLibrary
         units
     end
 
-    export construct_quantity_instances
-    function construct_quantity_instances(quantities, ontologies, symbols)
-        quantity_instances = initialize_dictionary()
-        for (quantity, quantity_data) in quantities
-            d = initialize_dictionary()
-            d["name"] = quantity
-            alternate_names = quantity_data["Alternate Names"]
-            d["alternate_names"] = ismissing(alternate_names) ? [] : map(remove_md_link, split(alternate_names, r"\s*,\s*"))
-            document = remove_md_link(quantity_data["Defining Document"])
-            ontology_key = "$document description"
-            ontology_data = ontologies[ontology_key]
-            d["description_iri_stem"] = ontology_data["iri_stem"]
-            d["vocabulary_iri_stem"] = ontology_data["companion_iri_stem"]
-            d["type"] = quantity_data["Type"]
-            d["item"] = quantity_data["Item"]
-            d["description"] = quantity_data["Description"]
-            symbol_field = quantity_data["Symbol"]
-            symbol_keys = ismissing(symbol_field) ? [] : map(remove_md_link, split(symbol_field, r"\s*,\s*"))
-            d["symbols"] = map(k -> symbols[k]["LaTeX"], symbol_keys)
-            d["dimension_symbol"] = "[to be constructed]"
-            name = instance_name(quantity)
-            d["quantity_class"] = NamingConventions.convert(SnakeCase, PascalCase, name)
-            d["unit_class"] = "$(d["quantity_class"])Unit"
-            d["value_class"] = "$(d["quantity_class"])Value"
-            d["relation"] = OrderedDict(
-                "forward" => "is$(d["quantity_class"])Of",
-                "reverse" => "has$(d["quantity_class"])"
-            )
-            quantity_instances[name] = d
-        end
-        quantity_instances
-    end
+    export reconcile_isq_units
+    function reconcile_isq_units(isq_units)
+        reconciliation = initialize_dictionary()
 
-    export construct_unit_instances
-    function construct_unit_instances(units, quantities, ontologies, quantity_instances)
-        unit_instances = initialize_dictionary()
-        for (unit, unit_data) in units
-            d = initialize_dictionary()
-            d["name"] = unit
-            d["type"] = unit_data["Type"]
-            if d["type"] == "Derived"
-                d["expression"] = unit_data["Expressed In Base Units"]
+        for (unit_id, unit_data) in isq_units
+            unit_class = NamingConventions.convert(SpaceCase, PascalCase, unit_data["label"])
+            if !haskey(reconciliation, unit_class)
+                reconciliation[unit_class] = Dict("instances" => [], "classes" => [])
             end
-            d["symbol"] = unit_data["Symbol"]
-            quantity_string = unit_data["ISQ Quantities"]
-            if !ismissing(quantity_string)
-                qs = map(remove_md_link, split(quantity_string, r"\s*,\s*"))
-                d["quantity"] = map(
-                    function(q)
-                        NamingConventions.convert(SpaceCase, SnakeCase, q)
-                    end,
-                    qs
-                )
-                d["description_iri_stem"] = unique(map(
-                    function(q)
-                        quantity_data = quantity_instances[q]
-                        quantity_data["description_iri_stem"]
-                    end,
-                    d["quantity"]
-                ))
-            end
-            name = instance_name(unit)
-            unit_instances[name] = d
+            push!(reconciliation[unit_class]["instances"], unit_data["iri"])
+            classes = mapfoldl(
+                p -> map(c -> first(p) * "#" * c, last(p)),
+                append!,
+                unit_data["quantity_classes"],
+                init = []
+            )
+            append!(reconciliation[unit_class]["classes"], classes)
         end
-        unit_instances
+
+        filter(p -> length(last(p)["classes"]) > 1, reconciliation)
     end
 
 end
