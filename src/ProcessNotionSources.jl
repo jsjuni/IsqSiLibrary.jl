@@ -30,6 +30,10 @@ module Main
                 help = "defining documents source (CSV)"
                 arg_type = String
                 required = true
+            "--ontology-integrations"
+                help = "ontology integrations source (CSV)"
+                arg_type = String
+                required = true
             "--ontology-bundles"
                 help = "ontology bundles source (CSV)"
                 arg_type = String
@@ -92,6 +96,9 @@ module Main
         @info "$(now()) loading documents source $(args["defining-documents"])"
         defining_documents_df = load_csv_document(args["sources-path-prefix"], args["defining-documents"])
 
+        @info "$(now()) loading ontology bundles source $(args["ontology-integrations"])"
+        ontology_integrations_df = load_csv_document(args["sources-path-prefix"], args["ontology-integrations"])
+
         @info "$(now()) loading ontology bundles source $(args["ontology-bundles"])"
         ontology_bundles_df = load_csv_document(args["sources-path-prefix"], args["ontology-bundles"])
 
@@ -122,15 +129,19 @@ module Main
         knowledge["authorities"] = authorities
 
         #
-        # create ontologies and bundles
+        # create ontologies, integrations, and bundles
         #
 
         @info "$(now()) create ontologies"
         ontologies = construct_ontologies(authorities, defining_documents_df)
         knowledge["ontologies"] = ontologies
 
+        @info "$(now()) create integrations"
+        integrations = construct_integrations(authorities, ontologies, ontology_integrations_df)
+        knowledge["integrations"] = integrations
+
         @info "$(now()) create bundles"
-        bundles = construct_bundles(authorities, ontologies, ontology_bundles_df)
+        bundles = construct_bundles(authorities, ontologies, integrations, ontology_bundles_df)
         knowledge["bundles"] = bundles
 
         #

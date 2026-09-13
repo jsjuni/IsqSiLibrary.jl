@@ -176,8 +176,31 @@ module IsqSiLibrary
         ontologies
     end
 
+    export construct_integrations
+    function construct_integrations(authorities, ontologies, integrations_df)
+        
+        integrations = initialize_dictionary()
+
+        for row in eachrow(integrations_df)
+            integration_id = row["Integration"]
+            integration_path = row["IRI Path"]
+            for (type, suffix) in ONTOLOGY_TYPES
+                prefix = joinpath(integration_path, suffix)
+                d = OrderedDict(
+                    "integration" => integration_id,
+                    "type" => type,
+                    "prefix" => prefix,
+                    "iri_path" => prefix
+                )
+                integrations[prefix] = d
+            end
+        end
+
+        integrations
+    end
+
     export construct_bundles
-    function construct_bundles(authorities, ontologies, bundles_df)
+    function construct_bundles(authorities, ontologies, integrations, bundles_df)
 
         bundles = initialize_dictionary()
 
@@ -204,6 +227,31 @@ module IsqSiLibrary
                     push!(d["imports"], joinpath(bundle_path, BUNDLE_TYPES["vocabulary"]))
                 end
                 bundles[prefix] = d
+            end
+        end
+
+        for row in eachrow(bundles_df)
+            bundle_path = row["IRI Path"]
+            imports_integration = get_keys(row["Imports Integration"])
+            for (type, suffix) in ONTOLOGY_TYPES
+                importing_prefix = first(map(
+                    ib -> ib["prefix"],
+                    filter(
+                        bundle -> bundle["bundle"] == row["Bundle"] && bundle["type"] == type,
+                        collect(values(bundles))
+                    )
+                ))            
+                imported_iri_paths = map(
+                    ib -> ib["iri_path"],
+                    filter(
+                        integration -> integration["integration"] in imports_integration && integration["type"] == type,
+                        collect(values(integrations))
+                    )
+                )
+                append!(bundles[importing_prefix]["imports"], imported_iri_paths)
+                if type == "description"
+                    push!(bundles[importing_prefix]["imports"], joinpath(bundle_path, ONTOLOGY_TYPES["vocabulary"]))
+                end
             end
         end
 
@@ -464,6 +512,7 @@ module IsqSiLibrary
             else
                 reconciliation[unit_class] = Dict("instances" => Dict(), "classes" => Dict())
             end
+
             ruci = ruc["instances"]
             ilist = if haskey(ruci, description_iri_path)
                 ruci[description_iri_path]

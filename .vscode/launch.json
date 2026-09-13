@@ -31,6 +31,7 @@
                 "--sources-path-prefix", "${workspaceFolder}/build/stage_3",
                 "--authorities", "Authorities 3cab24cf917a8009a0f1dbb33f6d42db.csv",
                 "--defining-documents", "Defining Documents ff3fbbe356d348cfb81f1038b92ce8fe.csv",
+                "--ontology-integrations", "Ontology Integrations 3dab24cf917a80ee9759f5ff38a65d2f.csv",
                 "--ontology-bundles", "Ontology Bundles 3c9b24cf917a8045911dff3107056a71.csv",
                 "--isq-alternate-quantity-names", "ISQ Alternate Quantity Names 3bfb24cf917a807b894aef90b1c6b03d.csv",
                 "--isq-quantities", "ISQ Quantities e1b3e75b0f85444aa01339cbc9e867df.csv",
