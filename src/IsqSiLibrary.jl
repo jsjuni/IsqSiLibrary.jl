@@ -458,20 +458,47 @@ module IsqSiLibrary
 
         for (unit_id, unit_data) in isq_units
             unit_class = NamingConventions.convert(SpaceCase, PascalCase, unit_data["label"])
-            if !haskey(reconciliation, unit_class)
-                reconciliation[unit_class] = Dict("instances" => [], "classes" => [])
+            description_iri_path = unit_data["description_iri_path"]
+            ruc = if haskey(reconciliation, unit_class)
+                reconciliation[unit_class]
+            else
+                reconciliation[unit_class] = Dict("instances" => Dict(), "classes" => Dict())
             end
-            push!(reconciliation[unit_class]["instances"], unit_data["iri"])
-            classes = mapfoldl(
-                p -> map(c -> first(p) * "#" * c, last(p)),
-                append!,
-                unit_data["quantity_classes"],
-                init = []
-            )
-            append!(reconciliation[unit_class]["classes"], classes)
+            ruci = ruc["instances"]
+            ilist = if haskey(ruci, description_iri_path)
+                ruci[description_iri_path]
+            else
+                ruci[description_iri_path] = []
+            end
+            push!(ilist, unit_data["name"])
+
+            rucc = ruc["classes"]
+            for (vocabulary_iri_path, unit_classes) in unit_data["quantity_classes"]
+                clist = if haskey(rucc, vocabulary_iri_path)
+                    rucc[vocabulary_iri_path]
+                else
+                    rucc[vocabulary_iri_path] = []
+                end
+                append!(clist, unit_classes)
+            end
         end
 
-        filter(p -> length(last(p)["classes"]) > 1, reconciliation)
+        filter(
+            p -> (
+                mapreduce(
+                    v -> length(v),
+                    +,
+                    values(last(p)["classes"])
+                ) > 1
+            ) || (
+                mapreduce(
+                v -> length(v),
+                +,
+                values(last(p)["instances"])
+                ) > 1
+            ),
+            reconciliation
+        )
     end
 
 end
