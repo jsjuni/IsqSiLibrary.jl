@@ -383,19 +383,24 @@ module CreateOML
         integration_desc_iri = first(ontology_iri_ns(namespace_base, input["integrations"][ISO_IEC_INTEGRATION_DESC_PREFIX]["iri_path"], separator))
         for (class_id, class_data) in input["isq_unit_reconciliation"]
             @info "$(now())   $class_id"
-            if length(keys(class_data["instances"])) > 1
-                for (desc_iri_path, labels) in class_data["instances"]
-                    description_ns = last(ontology_iri_ns(namespace_base, desc_iri_path, separator))
-                    for label in labels
-                        instance_stem = encode_instance_stem(label)
-                        instance_iri = description_ns * instance_stem
-                        append!(stage_4, [
-                            create_instance_ref(integration_desc_iri, instance_iri),
-                            add_annotation(integration_desc_iri, instance_iri, RDFS_LABEL, label),
-                            add_annotation(integration_desc_iri, instance_iri, RDFS_COMMENT, "type: $class_id")
-                        ])
-                    end
+            use_integration = length(keys(class_data)) > 1
+            for (desc_iri_path, i_dict) in class_data
+                (description_iri, description_ns) = ontology_iri_ns(namespace_base, desc_iri_path, separator)
+                label = i_dict["instance"]
+                instance_stem = encode_instance_stem(label)
+                instance_iri = description_ns * instance_stem
+                target_desc_iri = if use_integration
+                    append!(stage_4, [
+                        create_instance_ref(integration_desc_iri, instance_iri),
+                        add_annotation(integration_desc_iri, instance_iri, RDFS_LABEL, label)
+                    ])
+                    integration_desc_iri
+                else
+                    description_iri
                 end
+                append!(stage_4, [
+                   add_annotation(target_desc_iri, instance_iri, RDFS_COMMENT, "type: $class_id")
+                ])
             end
         end
 

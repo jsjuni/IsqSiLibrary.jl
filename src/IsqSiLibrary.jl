@@ -460,13 +460,9 @@ module IsqSiLibrary
                 function(ad, qd)
                     d_iri_path = qd["description_iri_path"]
                     v_iri_path = qd["vocabulary_iri_path"]
-                    if !haskey(ad, d_iri_path)
-                        ad[d_iri_path] = Dict("quantities" => [], "classes" => Dict())
-                    end
+                    get!(ad, d_iri_path, Dict("quantities" => [], "classes" => Dict()))
                     push!(ad[d_iri_path]["quantities"], qd["label"])
-                    if !haskey(ad[d_iri_path]["classes"], v_iri_path)
-                        ad[d_iri_path]["classes"][v_iri_path] = []
-                    end
+                    get!(ad[d_iri_path]["classes"], v_iri_path, [])
                     push!(ad[d_iri_path]["classes"][v_iri_path], qd["classes"]["unit"])
                     ad
                 end,
@@ -504,47 +500,34 @@ module IsqSiLibrary
         for (unit_id, unit_data) in isq_units
             unit_class = NamingConventions.convert(SpaceCase, PascalCase, unit_data["label"])
             description_iri_path = unit_data["description_iri_path"]
-            ruc = if haskey(reconciliation, unit_class)
-                reconciliation[unit_class]
-            else
-                reconciliation[unit_class] = Dict("instances" => Dict(), "classes" => Dict())
-            end
+            ruc = get!(reconciliation, unit_class, Dict())
+            ruci = get!(ruc, description_iri_path, Dict())
+            ruci["instance"] = unit_data["label"]
 
-            ruci = ruc["instances"]
-            ilist = if haskey(ruci, description_iri_path)
-                ruci[description_iri_path]
-            else
-                ruci[description_iri_path] = []
-            end
-            push!(ilist, unit_data["label"])
-
-            rucc = ruc["classes"]
+            rucic = get!(ruci, "classes", Dict())
             for (vocabulary_iri_path, unit_classes) in unit_data["quantity_classes"]
-                clist = if haskey(rucc, vocabulary_iri_path)
-                    rucc[vocabulary_iri_path]
-                else
-                    rucc[vocabulary_iri_path] = []
-                end
+                clist = get!(rucic, vocabulary_iri_path, [])
                 append!(clist, unit_classes)
             end
         end
 
         filter(
-            p -> (
-                mapreduce(
-                    v -> length(v),
+            p1 -> mapreduce(
+                p2 -> mapreduce(
+                    p3 -> mapreduce(
+                        p4 -> length(last(p4)),
+                        +,
+                        last(p3)
+                    ),
                     +,
-                    values(last(p)["classes"])
-                ) > 1
-            ) || (
-                mapreduce(
-                v -> length(v),
+                    last(p2)["classes"]
+                ),
                 +,
-                values(last(p)["instances"])
-                ) > 1
-            ),
+                last(p1)
+            ) > 1,
             reconciliation
         )
+
     end
 
 end
