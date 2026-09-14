@@ -185,12 +185,12 @@ module IsqSiLibrary
             integration_id = row["Integration"]
             integration_path = row["IRI Path"]
             for (type, suffix) in ONTOLOGY_TYPES
-                prefix = joinpath(integration_path, suffix)
+                prefix = "$integration_path-$suffix"
                 d = OrderedDict(
                     "integration" => integration_id,
                     "type" => type,
                     "prefix" => prefix,
-                    "iri_path" => prefix
+                    "iri_path" => joinpath(integration_path, suffix)
                 )
                 integrations[prefix] = d
             end
@@ -249,9 +249,6 @@ module IsqSiLibrary
                     )
                 )
                 append!(bundles[importing_prefix]["imports"], imported_iri_paths)
-                if type == "description"
-                    push!(bundles[importing_prefix]["imports"], joinpath(bundle_path, ONTOLOGY_TYPES["vocabulary"]))
-                end
             end
         end
 
@@ -519,7 +516,7 @@ module IsqSiLibrary
             else
                 ruci[description_iri_path] = []
             end
-            push!(ilist, unit_data["name"])
+            push!(ilist, unit_data["label"])
 
             rucc = ruc["classes"]
             for (vocabulary_iri_path, unit_classes) in unit_data["quantity_classes"]

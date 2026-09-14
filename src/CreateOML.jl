@@ -27,8 +27,8 @@ module CreateOML
 
     # rdfs vocabulary
 
-    const RDFS_LABEL = "<http://www.w3.org/2000/01/rdf-schema#label>"
-    const RDFS_COMMENT = "<http://www.w3.org/2000/01/rdf-schema#comment>"
+    const RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label"
+    const RDFS_COMMENT = "http://www.w3.org/2000/01/rdf-schema#comment"
 
     # vim vocabulary
 
@@ -65,6 +65,9 @@ module CreateOML
 
     const HAS_BASE_UNIT_EXPRESSION = "<http://iso-iec/iso.org/iso-80000/1-v#hasBaseUnitExpression>"
 
+    const ISO_IEC_INTEGRATION_DESC_PREFIX = "iso-iec-d"
+    const ISO_IEC_INTEGRATION_VOCAB_PREFIX = "iso-iec-v"
+    
     # other constants
 
     const PLURAL = Dict("quantity" => "quantities", "unit" => "units", "value" => "values")
@@ -196,7 +199,7 @@ module CreateOML
                 (iri, ns) = ontology_iri_ns(namespace_base, ontology_data["iri_path"], separator)
                 label = ontology_data["label"]
                 source = "$label $(ontology_data["title"])"
-                append!(stage_3, [
+                append!(stage_1, [
                     create_ontology(
                         ontology_data["type"],
                         ns,
@@ -208,8 +211,29 @@ module CreateOML
                     add_annotation(iri, iri, DC_SOURCE, source)
                 ])
                 if !isnothing(creator)
-                    push!(stage_3, add_annotation(iri, iri, DC_CREATOR, creator))
+                    push!(stage_1, add_annotation(iri, iri, DC_CREATOR, creator))
                 end
+            end
+        end
+
+        # create integrations
+
+        @info "$(now()) create integrations"
+        for (integration_id, integration_data) in input["integrations"]
+            @info "$(now())   $integration_id"
+            (iri, ns) = ontology_iri_ns(namespace_base, integration_data["iri_path"], separator)
+            type = integration_data["type"]
+            append!(stage_2, [
+                create_ontology(
+                    type,
+                    ns,
+                    integration_data["prefix"],
+                    args["path-base"]
+                ),
+                add_annotation(iri, iri, DC_TITLE, integration_id),
+            ])
+            if !isnothing(creator)
+                push!(stage_2, add_annotation(iri, iri, DC_CREATOR, creator))
             end
         end
 
@@ -220,7 +244,7 @@ module CreateOML
             @info "$(now())   $bundle_id"
             (iri, ns) = ontology_iri_ns(namespace_base, bundle_data["iri_path"], separator)
             type = "$(bundle_data["type"]) bundle"
-            append!(stage_3, [
+            append!(stage_2, [
                 create_ontology(
                     type,
                     ns,
@@ -230,7 +254,7 @@ module CreateOML
                 add_annotation(iri, iri, DC_TITLE, bundle_id)
             ])
             if !isnothing(creator)
-                push!(stage_3, add_annotation(iri, iri, DC_CREATOR, creator))
+                push!(stage_2, add_annotation(iri, iri, DC_CREATOR, creator))
             end
             for imported in bundle_data["imports"]
                 imported_iri = first(ontology_iri_ns(namespace_base, imported, separator))
@@ -349,6 +373,28 @@ module CreateOML
             for classes in values(unit_data["quantity_classes"])
                 for class in classes
                     push!(stage_3, add_annotation(description_iri, unit_iri, RDFS_COMMENT, "type: $class"))
+                end
+            end
+        end
+
+        # reconcile isq units
+
+        @info "$(now()) reconcile isq units"
+        integration_desc_iri = first(ontology_iri_ns(namespace_base, input["integrations"][ISO_IEC_INTEGRATION_DESC_PREFIX]["iri_path"], separator))
+        for (class_id, class_data) in input["isq_unit_reconciliation"]
+            @info "$(now())   $class_id"
+            if length(keys(class_data["instances"])) > 1
+                for (desc_iri_path, labels) in class_data["instances"]
+                    description_ns = last(ontology_iri_ns(namespace_base, desc_iri_path, separator))
+                    for label in labels
+                        instance_stem = encode_instance_stem(label)
+                        instance_iri = description_ns * instance_stem
+                        append!(stage_4, [
+                            create_instance_ref(integration_desc_iri, instance_iri),
+                            add_annotation(integration_desc_iri, instance_iri, RDFS_LABEL, label),
+                            add_annotation(integration_desc_iri, instance_iri, RDFS_COMMENT, "type: $class_id")
+                        ])
+                    end
                 end
             end
         end
