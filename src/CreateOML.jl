@@ -1,4 +1,4 @@
-module Main
+module CreateOML
 
     using ArgParse
     using Logging
@@ -10,53 +10,83 @@ module Main
     
     # xsd vocabulary
 
-    const XSD_ANYURI = "<http://www.w3.org/2001/XMLSchema#anyURI>"
+    const XSD_ANYURI = "http://www.w3.org/2001/XMLSchema#anyURI"
     
     # dc vocabulary
 
-    const DC_CREATOR = "<http://purl.org/dc/elements/1.1/creator>"
-    const DC_DESCRIPTION = "<http://purl.org/dc/elements/1.1/description>"
-    const DC_SOURCE = "<http://purl.org/dc/elements/1.1/source>"
-    const DC_TITLE = "<http://purl.org/dc/elements/1.1/title>"
-    const DC_IDENTIFIER = "<http://purl.org/dc/elements/1.1/identifier>"
-    const DC_TYPE = "<http://purl.org/dc/elements/1.1/type>"
+    const DC_CREATOR = "http://purl.org/dc/elements/1.1/creator"
+    const DC_DESCRIPTION = "http://purl.org/dc/elements/1.1/description"
+    const DC_SOURCE = "http://purl.org/dc/elements/1.1/source"
+    const DC_TITLE = "http://purl.org/dc/elements/1.1/title"
+    const DC_IDENTIFIER = "http://purl.org/dc/elements/1.1/identifier"
+    const DC_TYPE = "http://purl.org/dc/elements/1.1/type"
 
     # rdf vocabulary
 
-    const RDF_TYPE = "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"
+    const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 
     # rdfs vocabulary
 
-    const RDFS_LABEL = "<http://www.w3.org/2000/01/rdf-schema#label>"
+    const RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label"
+    const RDFS_COMMENT = "http://www.w3.org/2000/01/rdf-schema#comment"
 
-    # vim3 vocabulary
+    # vim vocabulary
 
-    const IS_PROPERTY_OF = "<http://bipm.org/jcgm/vim3-v#isPropertyOf>"
-    const HAS_DIMENSION_SYMBOL = "<http://bipm.org/jcgm/vim3-v#hasDimensionSymbol>"
+    const HAS_QUANTITY_IDENTIFIER = "http://bipm.org/vim-v#hasQuantityIdentifier"
+    const HAS_MEASUREMENT_UNIT_IDENTIFIER = "http://bipm.org/vim-v#hasMeasurementUnitIdentifier"
+
+    const IS_MEASUREMENT_UNIT_FOR = "http://bipm.org/vim-v#isMeasurementUnitFor"
+    const IS_PROPERTY_OF = "http://bipm.org/vim-v#isPropertyOf"
+    const HAS_DIMENSION_SYMBOL = "http://bipm.org/vim-v#hasDimensionSymbol"
+
+    const SI_QUANTITY = "http://bipm.org/si-prov-v#SIQuantity"
+    const SI_BASE_QUANTITY = "http://bipm.org/si-prov-v#SIBaseQuantity"
+    const SI_NAMED_QUANTITY = "http://bipm.org/si-prov-v#SINamedQuantity"
+    const SI_NON_SI_QUANTITY = "http://bipm.org/si-prov-v#SINonSIQuantity"
+ 
+    const SI_UNIT = "http://bipm.org/si-prov-v#SIUnit"
+    const SI_BASE_UNIT = "http://bipm.org/si-prov-v#SIBaseUnit"
+    const SI_NAMED_UNIT = "http://bipm.org/si-prov-v#SINamedUnit"
+    const SI_NON_SI_UNIT = "http://bipm.org/si-prov-v#SINonSIUnit"
+
+    const HAS_UNIT_SYMBOL = "http://bipm.org/si-prov-v#hasUnitSymbol"
 
     # iso 80000 vocabulary
 
-    const HAS_QUANTITY_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasQuantityIdentifier>"
-    const HAS_UNIT_IDENTIFIER = "<http://iso.org/iso-80000/1-v#hasUnitIdentifier>"
-    const HAS_SYMBOL = "<http://iso.org/iso-80000/1-v#hasSymbol>"
+    const HAS_QUANTITY_SYMBOL = "http://iso-iec/iso.org/iso-80000/1-v#hasQuantitySymbol"
 
-    const ISQ_BASE_QUANTITY = "<http://iso.org/iso-80000/1-v#ISQBaseQuantity>"
-    const ISQ_DERIVED_QUANTITY = "<http://iso.org/iso-80000/1-v#ISQDerivedQuantity>"
+    const ISQ_QUANTITY = "http://iso-iec/iso.org/iso-80000/1-v#ISQQuantity"
+    const ISQ_BASE_QUANTITY = "http://iso-iec/iso.org/iso-80000/1-v#ISQBaseQuantity"
+    const ISQ_DERIVED_QUANTITY = "http://iso-iec/iso.org/iso-80000/1-v#ISQDerivedQuantity"
     
-    const SI_BASE_UNIT = "<http://iso.org/iso-80000/1-v#SIBaseUnit>"
-    const SI_DERIVED_UNIT = "<http://iso.org/iso-80000/1-v#SIDerivedUnit>"
+    const ISQ_UNIT = "http://iso-iec/iso.org/iso-80000/1-v#ISQUnit"
+    const IS_BASE_UNIT_FOR = "http://iso-iec/iso.org/iso-80000/1-v#isBaseUnitFor"
+    const IS_DERIVED_UNIT_FOR = "http://iso-iec/iso.org/iso-80000/1-v#isDerivedUnitFor"
 
-    const IS_BASE_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isBaseUnitFor>"
-    const IS_DERIVED_UNIT_FOR = "<http://iso.org/iso-80000/1-v#isDerivedUnitFor>"
+    const HAS_BASE_UNIT_EXPRESSION = "http://iso-iec/iso.org/iso-80000/1-v#hasBaseUnitExpression"
 
-    const HAS_BASE_UNIT_EXPRESSION = "<http://iso.org/iso-80000/1-v#hasBaseUnitExpression>"
-
-    # vim3 ontologies
-
-    const VIM3_VOCABULARY = "<http://bipm.org/jcgm/vim3-v>"
-    const VIM3_DESCRIPTION = "<http://bipm.org/jcgm/vim3-d"
+    const ISO_IEC_INTEGRATION_DESC_PREFIX = "iso-iec-d"
+    const ISO_IEC_INTEGRATION_VOCAB_PREFIX = "iso-iec-v"
+    
+    # other constants
 
     const PLURAL = Dict("quantity" => "quantities", "unit" => "units", "value" => "values")
+
+    const SI_QUANTITY_CLASS = Dict(
+        "base" => SI_BASE_QUANTITY,
+        "named" => SI_NAMED_QUANTITY,
+        "non-si" => SI_NON_SI_QUANTITY,
+        missing => SI_QUANTITY,
+        nothing => SI_QUANTITY
+    )
+
+    const SI_UNIT_CLASS = Dict(
+        "base" => SI_BASE_UNIT,
+        "named" => SI_NAMED_UNIT,
+        "non-si" => SI_NON_SI_UNIT,
+        missing => SI_UNIT,
+        nothing => SI_UNIT
+    )
 
     function parse_commandline()
         s = ArgParseSettings()
@@ -91,6 +121,13 @@ module Main
                 help = "Value of dc:creator annotation on ontologies and bundles"
                 arg_type = String
                 default = nothing
+            "--partition-size"
+                help = "Parition size for segmented updates"
+                arg_type = Int64
+                default = 100
+            "--save-operations"
+                arg_type = String
+                default = nothing
         end
         return parse_args(s)
     end
@@ -101,41 +138,11 @@ module Main
         (iri, ns)
     end
 
-    function create_quantity_or_unit_instance(instance_data, description_iri_stem, instance_id, namespace_base, has_identifier, base_or_derived, separator)
-        operations = []
-        (description_iri, description_ns) = ontology_iri_ns(
-            namespace_base, description_iri_stem, separator
-        )
-        instance_iri = description_ns * instance_id
-        append!(operations, [
-            create_instance(description_iri, instance_id),
-            add_assertion(description_iri, instance_iri, RDF_TYPE, base_or_derived),
-            add_annotation(description_iri, instance_iri, RDFS_LABEL, instance_data["name"]),
-            add_assertion(description_iri, instance_iri, has_identifier, instance_data["name"]),
-        ])
-
-        if haskey(instance_data, "symbols")
-            for symbol in instance_data["symbols"]
-                push!(operations,
-                    add_assertion(description_iri, instance_iri, HAS_SYMBOL, symbol)
-                )
-            end
-        end
-    
-        if haskey(instance_data, "alternate_names")
-            for alternate_name in instance_data["alternate_names"]
-                push!(operations,
-                    add_annotation(description_iri, instance_iri, RDFS_LABEL, alternate_name)
-                )
-            end
-        end
-        operations
-    end
-
     function capitalize(string)
         Base.Unicode.uppercasefirst(string)
     end
 
+    export main
     function(@main)(ARGS)
 
         @info "$(now()) start"
@@ -149,6 +156,8 @@ module Main
         path_base = args["path-base"]
         separator = args["separator"]
         creator = args["creator"]
+
+        global_logger(ConsoleLogger(Info))
 
         # check server status
 
@@ -167,38 +176,64 @@ module Main
 
         input = JSON.parse(input_file)
 
-        stage_1 = []
-        stage_2 = []
+        stage_1 = [] # bundle deletion
+        stage_2 = [] # ontology deletion
+        stage_3 = [] # ontology and bundle creation, population
+        stage_4 = [] # bundle imports
 
         operations = OrderedDict(
             "stage 1" => stage_1,
-            "stage 2" => stage_2
+            "stage 2" => stage_2,
+            "stage 3" => stage_3,
+            "stage 4" => stage_4
         )
 
         # create ontologies
 
         @info "$(now()) create ontologies"
         for (ontology_id, ontology_data) in input["ontologies"]
-            filename = joinpath(path_base, namespace_path, ontology_data["iri_stem"]) * ".oml"
-            if isfile(filename)
-                @info "$(now())   skip $ontology_id: file exists"
+            if ontology_data["curated"]
+                @info "$(now())   skip curated ontology $ontology_id"
             else
-                (ontology_iri, ontology_namespace) = ontology_iri_ns(namespace_base, ontology_data["iri_stem"], args["separator"])
-                @info "$(now())   create $ontology_id $ontology_namespace"
+                @info "$(now())   $ontology_id"
+                (iri, ns) = ontology_iri_ns(namespace_base, ontology_data["iri_path"], separator)
+                label = ontology_data["label"]
+                source = "$label $(ontology_data["title"])"
                 append!(stage_1, [
                     create_ontology(
                         ontology_data["type"],
-                        ontology_namespace,
+                        ns,
                         ontology_data["prefix"],
                         args["path-base"]
                     ),
-                    add_annotation(ontology_iri, ontology_iri, DC_TITLE, ontology_id),
-                    add_annotation(ontology_iri, ontology_iri, RDFS_LABEL, ontology_data["label"]),
-                    add_annotation(ontology_iri, ontology_iri, DC_SOURCE, ontology_data["source"])
+                    add_annotation(iri, iri, DC_TITLE, ontology_id),
+                    add_annotation(iri, iri, RDFS_LABEL, label),
+                    add_annotation(iri, iri, DC_SOURCE, source)
                 ])
                 if !isnothing(creator)
-                    push!(stage_1, add_annotation(ontology_iri, ontology_iri, DC_CREATOR, creator))
+                    push!(stage_1, add_annotation(iri, iri, DC_CREATOR, creator))
                 end
+            end
+        end
+
+        # create integrations
+
+        @info "$(now()) create integrations"
+        for (integration_id, integration_data) in input["integrations"]
+            @info "$(now())   $integration_id"
+            (iri, ns) = ontology_iri_ns(namespace_base, integration_data["iri_path"], separator)
+            type = integration_data["type"]
+            append!(stage_2, [
+                create_ontology(
+                    type,
+                    ns,
+                    integration_data["prefix"],
+                    args["path-base"]
+                ),
+                add_annotation(iri, iri, DC_TITLE, integration_id),
+            ])
+            if !isnothing(creator)
+                push!(stage_2, add_annotation(iri, iri, DC_CREATOR, creator))
             end
         end
 
@@ -206,151 +241,160 @@ module Main
 
         @info "$(now()) create bundles"
         for (bundle_id, bundle_data) in input["bundles"]
-            (bundle_iri, bundle_namespace) = ontology_iri_ns(namespace_base, bundle_data["iri_stem"], args["separator"])
-            @info "$(now())   create $bundle_id $bundle_namespace"
-            append!(stage_1, [
+            @info "$(now())   $bundle_id"
+            (iri, ns) = ontology_iri_ns(namespace_base, bundle_data["iri_path"], separator)
+            type = "$(bundle_data["type"]) bundle"
+            append!(stage_2, [
                 create_ontology(
-                    bundle_data["type"],
-                    bundle_namespace,
+                    type,
+                    ns,
                     bundle_data["prefix"],
                     args["path-base"]
                 ),
-                add_annotation(bundle_iri, bundle_iri, DC_TITLE, bundle_id)
+                add_annotation(iri, iri, DC_TITLE, bundle_id)
             ])
             if !isnothing(creator)
-                push!(stage_1, add_annotation(bundle_iri, bundle_iri, DC_CREATOR, creator))
+                push!(stage_2, add_annotation(iri, iri, DC_CREATOR, creator))
             end
-            if bundle_data["type"] == "vocabulary bundle"
-                push!(stage_2, add_import(bundle_iri, VIM3_VOCABULARY))
-            else
-                push!(stage_2, add_import(bundle_iri, VIM3_VOCABULARY))
-                push!(stage_2, add_import(bundle_iri, VIM3_DESCRIPTION))
-            end
-            for imprt in bundle_data["imports"]
-                (imprt_iri, unused) = ontology_iri_ns(namespace_base, imprt, args["separator"])
-                @info "$(now())     add import for $imprt"
-                push!(stage_2, add_import(bundle_iri, imprt_iri))
+            for imported in bundle_data["imports"]
+                imported_iri = first(ontology_iri_ns(namespace_base, imported, separator))
+                @info "$(now())     imports $imported_iri"
+                push!(stage_4, add_import(iri, imported_iri))
             end
         end
 
-        # process quantities
+        # process si quantities
 
-        @info "$(now()) process quantities"
-        for (quantity_id, quantity_data) in input["quantity_instances"]
-            @info "$(now())   $(quantity_data["description_iri_stem"]) $quantity_id"
-
-            # create quantity instance
-
-            append!(stage_1,
-                create_quantity_or_unit_instance(
-                    quantity_data,
-                    quantity_data["description_iri_stem"],
-                    quantity_id,
-                    namespace_base,
-                    HAS_QUANTITY_IDENTIFIER,
-                    quantity_data["type"] == "Base" ? ISQ_BASE_QUANTITY : ISQ_DERIVED_QUANTITY,
-                    separator
-                )
-            )
-
-            (vocabulary_iri, vocabulary_ns) = ontology_iri_ns(
-                namespace_base, quantity_data["vocabulary_iri_stem"], separator
-            )
-            (description_iri, description_ns) = ontology_iri_ns(
-                namespace_base, quantity_data["description_iri_stem"], separator
-            )
-            quantity_iri = description_ns * quantity_id
-
-            # add identifier annotation and description
-
-            append!(stage_1, [
-                add_annotation(description_iri, quantity_iri, DC_IDENTIFIER, quantity_data["item"]),
-                add_annotation(description_iri, quantity_iri, DC_DESCRIPTION, quantity_data["description"])
+        @info "$(now()) process si quantities"
+        for (quantity_id, quantity_data) in input["si_quantities"]
+            label = quantity_data["label"]
+            @info "$(now())   $label"
+            si_label = quantity_data["si_label"]
+            description_iri = first(ontology_iri_ns(namespace_base, quantity_data["description_iri_path"], separator))
+            quantity_stem = encode_instance_stem(label)
+            quantity_iri = description_iri * separator * quantity_stem
+            quantity_class = quantity_data["classes"]["quantity"]
+            si_quantity_class = SI_QUANTITY_CLASS[quantity_data["type"]]
+            append!(stage_3, [
+                create_instance(description_iri, quantity_stem),
+                add_annotation(description_iri, quantity_iri, RDFS_LABEL, label),
+                add_assertion(description_iri, quantity_iri, HAS_QUANTITY_IDENTIFIER, label),
+                add_annotation(description_iri, quantity_iri, RDFS_COMMENT, "type: $quantity_class"),
+                add_assertion(description_iri, quantity_iri, RDF_TYPE, si_quantity_class)
             ])
-
-            # create quantity classes
-
-            for category_key in ("quantity", "unit", "value")
-                concept = quantity_data["$(category_key)_class"]
-                description = "$(capitalize(PLURAL[category_key])) of quantity kind \"$(quantity_data["name"])\"."
-                @info "$(now())     create concept $vocabulary_ns$concept"
-                @info "$(now())       description: $description"
-                append!(stage_1, [
-                ])
+            if !isnothing(si_label)
+                push!(stage_3, add_annotation(description_iri, quantity_iri, RDFS_LABEL, si_label))
             end
+        end
 
-            # assert dimension symbol
+        # process si units
 
-            push!(stage_1,
-                add_assertion(description_iri, quantity_iri, HAS_DIMENSION_SYMBOL, quantity_data["dimension_symbol"])
-            )
-
-            # assert quantity class of instance
-
-            @info "$(now())     assert $quantity_id type $(quantity_data["quantity_class"])"
-
-            # create quantity relation
-
-            @info "$(now())     create forward relation $vocabulary_ns$(quantity_data["relation"]["forward"])"
-            @info "$(now())            reverse relation $vocabulary_ns$(quantity_data["relation"]["reverse"])"
-            append!(stage_1, [
+        @info "$(now()) process si units"
+        for (unit_id, unit_data) in input["si_units"]
+            label = unit_data["label"]
+            @info "$(now())   $label"
+            description_iri = first(ontology_iri_ns(namespace_base, unit_data["description_iri_path"], separator))
+            unit_stem = encode_instance_stem(label)
+            unit_iri = description_iri * separator * unit_stem
+            si_unit_class = SI_UNIT_CLASS[unit_data["type"]]
+            symbol = unit_data["symbol"]
+            append!(stage_3, [
+                create_instance(description_iri, unit_stem),
+                add_annotation(description_iri, unit_iri, RDFS_LABEL, label),
+                add_assertion(description_iri, unit_iri, HAS_MEASUREMENT_UNIT_IDENTIFIER, label),
+                add_assertion(description_iri, unit_iri, RDF_TYPE, si_unit_class),
+                add_assertion(description_iri, unit_iri, HAS_UNIT_SYMBOL, symbol)
             ])
-
-       end
-
-        # process units
-
-        @info "$(now()) process units"
-        for (unit_id, unit_data) in input["unit_instances"]
-            for description_iri_stem = unit_data["description_iri_stem"]
-                @info "$(now())   $(description_iri_stem) $unit_id"
-
-                # create quantity instance
-
-                append!(stage_1,
-                    create_quantity_or_unit_instance(
-                        unit_data,
-                        description_iri_stem,
-                        unit_id,
-                        namespace_base,
-                        HAS_UNIT_IDENTIFIER,
-                        unit_data["type"] == "Base" ? SI_BASE_UNIT : SI_DERIVED_UNIT,
-                        separator
-                    )
-                )
-
-                (description_iri, description_ns) = ontology_iri_ns(
-                    namespace_base, description_iri_stem, separator
-                )
-                unit_iri = description_ns * unit_id
-
-                # assert unit classes of instance
-                
-                vocabulary_iri_stem = companion_iri_stem(description_iri_stem, input["ontologies"])
-
-                for quantity in unit_data["quantity"]
-                    quantity_data = input["quantity_instances"][quantity]
-                    if vocabulary_iri_stem == quantity_data["vocabulary_iri_stem"]
-                        (vocabulary_iri, vocabulary_ns) = ontology_iri_ns(
-                            namespace_base, vocabulary_iri_stem, separator)
-                        unit_class = Dict(
-                            "datatypeIri" => XSD_ANYURI,
-                            "value" => vocabulary_iri * quantity_data["unit_class"]
-                        )
-                    
-                        @info "$(now())     assert $unit_id type $(quantity_data["unit_class"])"
-                        push!(stage_1,
-                            add_annotation(description_iri, unit_iri, DC_TYPE, unit_class)
-                        )
-                    end
+            for qd in unit_data["quantities"]
+                for (qd_iri_path, q_label) in qd
+                    qd_iri = first(ontology_iri_ns(namespace_base, qd_iri_path, separator))
+                    quantity_stem = encode_instance_stem(q_label)
+                    quantity_iri = qd_iri * separator * quantity_stem
+                    push!(stage_3, add_assertion(description_iri, unit_iri, IS_MEASUREMENT_UNIT_FOR, quantity_iri))
                 end
+            end
+        end
 
-                # assert base unit expression for derived units
+        # process isq quantities
 
-                if unit_data["type"] != "Base" # some "Supplemental" and "Jenkins" junk in there
-                    push!(stage_1,
-                        add_assertion(description_iri, unit_iri, HAS_BASE_UNIT_EXPRESSION, unit_data["expression"])
-                    )
+        @info "$(now()) process isq quantities"
+        for (quantity_id, quantity_data) in input["isq_quantities"]
+            label = quantity_data["label"]
+            @info "$(now())   $label"
+            description_iri = first(ontology_iri_ns(namespace_base, quantity_data["description_iri_path"], separator))
+            quantity_stem = encode_instance_stem(label)
+            quantity_iri = description_iri * separator * quantity_stem
+            quantity_class = quantity_data["classes"]["quantity"]
+            append!(stage_3, [
+                create_instance(description_iri, quantity_stem),
+                add_assertion(description_iri, quantity_iri, RDF_TYPE, ISQ_QUANTITY), # TEMPORARY
+                add_annotation(description_iri, quantity_iri, RDFS_LABEL, label),
+                add_assertion(description_iri, quantity_iri, HAS_QUANTITY_IDENTIFIER, label),
+                add_annotation(description_iri, quantity_iri, RDFS_COMMENT, "type: $quantity_class")
+            ])
+            append!(stage_3,
+                map(
+                    s -> add_assertion(description_iri, quantity_iri, HAS_QUANTITY_SYMBOL, s),
+                    quantity_data["symbols"]
+                )
+            )
+            append!(stage_3,
+                map(
+                    n -> add_annotation(description_iri, quantity_iri, RDFS_LABEL, n),
+                    quantity_data["alternate_names"]
+                )
+            )
+        end
+        
+        # process isq units
+
+        @info "$(now()) process isq units"
+        for (unit_id, unit_data) in input["isq_units"]
+            label = unit_data["label"]
+            @info "$(now())   $label"
+            description_iri = first(ontology_iri_ns(namespace_base, unit_data["description_iri_path"], separator))
+            unit_stem = encode_instance_stem(label)
+            unit_iri = description_iri * separator * unit_stem
+            symbol = unit_data["symbol"]
+            append!(stage_3, [
+                create_instance(description_iri, unit_stem),
+                add_assertion(description_iri, unit_iri, RDF_TYPE, ISQ_UNIT), # TEMPORARY
+                add_annotation(description_iri, unit_iri, RDFS_LABEL, label),
+                add_assertion(description_iri, unit_iri, HAS_MEASUREMENT_UNIT_IDENTIFIER, label)
+            ])
+            if !isnothing(symbol)
+                push!(stage_3, add_assertion(description_iri, unit_iri, HAS_UNIT_SYMBOL, symbol))
+            end
+            for quantity_label = unit_data["quantities"]
+                quantity_stem = encode_instance_stem(quantity_label)
+                quantity_iri = description_iri * separator * quantity_stem
+                push!(stage_3, add_assertion(description_iri, unit_iri, IS_MEASUREMENT_UNIT_FOR, quantity_iri))
+            end
+            for classes in values(unit_data["quantity_classes"])
+                for class in classes
+                    push!(stage_3, add_annotation(description_iri, unit_iri, RDFS_COMMENT, "type: $class"))
+                end
+            end
+        end
+
+        # reconcile isq units
+
+        @info "$(now()) reconcile isq units"
+        integration_desc_iri = first(ontology_iri_ns(namespace_base, input["integrations"][ISO_IEC_INTEGRATION_DESC_PREFIX]["iri_path"], separator))
+        for (class_id, class_data) in input["isq_unit_reconciliation"]
+            @info "$(now())   $class_id"
+            if length(keys(class_data["instances"])) > 1
+                for (desc_iri_path, labels) in class_data["instances"]
+                    description_ns = last(ontology_iri_ns(namespace_base, desc_iri_path, separator))
+                    for label in labels
+                        instance_stem = encode_instance_stem(label)
+                        instance_iri = description_ns * instance_stem
+                        append!(stage_4, [
+                            create_instance_ref(integration_desc_iri, instance_iri),
+                            add_annotation(integration_desc_iri, instance_iri, RDFS_LABEL, label),
+                            add_annotation(integration_desc_iri, instance_iri, RDFS_COMMENT, "type: $class_id")
+                        ])
+                    end
                 end
             end
         end
@@ -363,8 +407,21 @@ module Main
             @info "$(now()) update server"
             for (name, ops) in operations
                 @info "$(now())   $name $(length(ops)) operations"
-                update(server, ops, args["defer-diagnostics"])
+                for set in Iterators.partition(ops, args["partition-size"])
+                    @debug "$(now())     updating server with $(length(set)) operations"
+                    update(server, set, args["defer-diagnostics"])
+                end
             end
+        end
+
+        # save operations if requested
+
+        operations_filename = args["save-operations"]
+        if !isnothing(args["save-operations"])
+            @info "$(now()) save operations to $operations_filename"
+            operations_file = open(operations_filename, "w")
+            operations = Dict("stage_1" => stage_1, "stage_2" => stage_2, "stage_3" => stage_3, "stage_4" => stage_4)
+            JSON.json(operations_file, operations, pretty = true)
         end
 
         # end
@@ -374,3 +431,4 @@ module Main
     end
 
 end
+using .CreateOML
