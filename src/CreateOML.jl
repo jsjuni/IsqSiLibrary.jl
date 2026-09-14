@@ -10,20 +10,20 @@ module CreateOML
     
     # xsd vocabulary
 
-    const XSD_ANYURI = "<http://www.w3.org/2001/XMLSchema#anyURI>"
+    const XSD_ANYURI = "http://www.w3.org/2001/XMLSchema#anyURI"
     
     # dc vocabulary
 
-    const DC_CREATOR = "<http://purl.org/dc/elements/1.1/creator>"
-    const DC_DESCRIPTION = "<http://purl.org/dc/elements/1.1/description>"
-    const DC_SOURCE = "<http://purl.org/dc/elements/1.1/source>"
-    const DC_TITLE = "<http://purl.org/dc/elements/1.1/title>"
-    const DC_IDENTIFIER = "<http://purl.org/dc/elements/1.1/identifier>"
-    const DC_TYPE = "<http://purl.org/dc/elements/1.1/type>"
+    const DC_CREATOR = "http://purl.org/dc/elements/1.1/creator"
+    const DC_DESCRIPTION = "http://purl.org/dc/elements/1.1/description"
+    const DC_SOURCE = "http://purl.org/dc/elements/1.1/source"
+    const DC_TITLE = "http://purl.org/dc/elements/1.1/title"
+    const DC_IDENTIFIER = "http://purl.org/dc/elements/1.1/identifier"
+    const DC_TYPE = "http://purl.org/dc/elements/1.1/type"
 
     # rdf vocabulary
 
-    const RDF_TYPE = "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"
+    const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 
     # rdfs vocabulary
 
@@ -32,38 +32,38 @@ module CreateOML
 
     # vim vocabulary
 
-    const HAS_QUANTITY_IDENTIFIER = "<http://bipm.org/vim-v#hasQuantityIdentifier>"
-    const HAS_MEASUREMENT_UNIT_IDENTIFIER = "<http://bipm.org/vim-v#hasMeasurementUnitIdentifier>"
+    const HAS_QUANTITY_IDENTIFIER = "http://bipm.org/vim-v#hasQuantityIdentifier"
+    const HAS_MEASUREMENT_UNIT_IDENTIFIER = "http://bipm.org/vim-v#hasMeasurementUnitIdentifier"
 
-    const IS_MEASUREMENT_UNIT_FOR = "<http://bipm.org/vim-v#isMeasurementUnitFor>"
-    const IS_PROPERTY_OF = "<http://bipm.org/vim-v#isPropertyOf>"
-    const HAS_DIMENSION_SYMBOL = "<http://bipm.org/vim-v#hasDimensionSymbol>"
+    const IS_MEASUREMENT_UNIT_FOR = "http://bipm.org/vim-v#isMeasurementUnitFor"
+    const IS_PROPERTY_OF = "http://bipm.org/vim-v#isPropertyOf"
+    const HAS_DIMENSION_SYMBOL = "http://bipm.org/vim-v#hasDimensionSymbol"
 
-    const SI_QUANTITY = "<http://bipm.org/si-prov-v#SIQuantity>"
-    const SI_BASE_QUANTITY = "<http://bipm.org/si-prov-v#SIBaseQuantity>"
-    const SI_NAMED_QUANTITY = "<http://bipm.org/si-prov-v#SINamedQuantity>"
-    const SI_NON_SI_QUANTITY = "<http://bipm.org/si-prov-v#SINonSIQuantity>"
+    const SI_QUANTITY = "http://bipm.org/si-prov-v#SIQuantity"
+    const SI_BASE_QUANTITY = "http://bipm.org/si-prov-v#SIBaseQuantity"
+    const SI_NAMED_QUANTITY = "http://bipm.org/si-prov-v#SINamedQuantity"
+    const SI_NON_SI_QUANTITY = "http://bipm.org/si-prov-v#SINonSIQuantity"
  
-    const SI_UNIT = "<http://bipm.org/si-prov-v#SIUnit>"
-    const SI_BASE_UNIT = "<http://bipm.org/si-prov-v#SIBaseUnit>"
-    const SI_NAMED_UNIT = "<http://bipm.org/si-prov-v#SINamedUnit>"
-    const SI_NON_SI_UNIT = "<http://bipm.org/si-prov-v#SINonSIUnit>"
+    const SI_UNIT = "http://bipm.org/si-prov-v#SIUnit"
+    const SI_BASE_UNIT = "http://bipm.org/si-prov-v#SIBaseUnit"
+    const SI_NAMED_UNIT = "http://bipm.org/si-prov-v#SINamedUnit"
+    const SI_NON_SI_UNIT = "http://bipm.org/si-prov-v#SINonSIUnit"
 
-    const HAS_UNIT_SYMBOL = "<http://bipm.org/si-prov-v#hasUnitSymbol>"
+    const HAS_UNIT_SYMBOL = "http://bipm.org/si-prov-v#hasUnitSymbol"
 
     # iso 80000 vocabulary
 
-    const HAS_QUANTITY_SYMBOL = "<http://iso-iec/iso.org/iso-80000/1-v#hasQuantitySymbol>"
+    const HAS_QUANTITY_SYMBOL = "http://iso-iec/iso.org/iso-80000/1-v#hasQuantitySymbol"
 
-    const ISQ_QUANTITY = "<http://iso-iec/iso.org/iso-80000/1-v#ISQQuantity>"
-    const ISQ_BASE_QUANTITY = "<http://iso-iec/iso.org/iso-80000/1-v#ISQBaseQuantity>"
-    const ISQ_DERIVED_QUANTITY = "<http://iso-iec/iso.org/iso-80000/1-v#ISQDerivedQuantity>"
+    const ISQ_QUANTITY = "http://iso-iec/iso.org/iso-80000/1-v#ISQQuantity"
+    const ISQ_BASE_QUANTITY = "http://iso-iec/iso.org/iso-80000/1-v#ISQBaseQuantity"
+    const ISQ_DERIVED_QUANTITY = "http://iso-iec/iso.org/iso-80000/1-v#ISQDerivedQuantity"
     
-    const ISQ_UNIT = "<http://iso-iec/iso.org/iso-80000/1-v#ISQUnit>"
-    const IS_BASE_UNIT_FOR = "<http://iso-iec/iso.org/iso-80000/1-v#isBaseUnitFor>"
-    const IS_DERIVED_UNIT_FOR = "<http://iso-iec/iso.org/iso-80000/1-v#isDerivedUnitFor>"
+    const ISQ_UNIT = "http://iso-iec/iso.org/iso-80000/1-v#ISQUnit"
+    const IS_BASE_UNIT_FOR = "http://iso-iec/iso.org/iso-80000/1-v#isBaseUnitFor"
+    const IS_DERIVED_UNIT_FOR = "http://iso-iec/iso.org/iso-80000/1-v#isDerivedUnitFor"
 
-    const HAS_BASE_UNIT_EXPRESSION = "<http://iso-iec/iso.org/iso-80000/1-v#hasBaseUnitExpression>"
+    const HAS_BASE_UNIT_EXPRESSION = "http://iso-iec/iso.org/iso-80000/1-v#hasBaseUnitExpression"
 
     const ISO_IEC_INTEGRATION_DESC_PREFIX = "iso-iec-d"
     const ISO_IEC_INTEGRATION_VOCAB_PREFIX = "iso-iec-v"
